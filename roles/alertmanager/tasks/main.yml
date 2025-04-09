@@ -1,0 +1,35 @@
+---
+- name: Create Alertmanager config directory
+  ansible.builtin.file:
+    path: /etc/alertmanager/
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create EDA webhook bearer token file
+  ansible.builtin.copy:
+    dest: /etc/alertmanager/eda_token
+    content: "{{ eda_webhook_token }}"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Deploy Alertmanager configuration file
+  ansible.builtin.template:
+    src: alertmanager.yml.j2
+    dest: /etc/alertmanager/alertmanager.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Run Alertmanager container in Podman pod
+  containers.podman.podman_container:
+    name: alertmanager
+    pod: monitoring
+    image: quay.io/prometheus/alertmanager
+    state: started
+    restart_policy: always
+    volumes:
+      - /etc/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:z
+      - /etc/alertmanager/eda_token:/etc/alertmanager/eda_token:ro,z

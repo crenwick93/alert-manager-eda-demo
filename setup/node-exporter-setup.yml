@@ -1,0 +1,9 @@
+---
+
+- name: Install node exporter on application server
+  hosts: demo-app
+  become: true
+  roles:
+    - node_exporter
+  # - prometheus
+  # - alertmanager
