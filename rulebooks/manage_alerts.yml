@@ -1,0 +1,19 @@
+---
+- name: Respond to Alert Manager alerts
+  hosts: all
+  execution_strategy: parallel
+  sources:
+    - name: Listen for alerts
+      ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+      filters:
+        - ansible.eda.normalize_keys:
+  rules:
+    - name: test match
+      condition: >
+        event.payload.status == "firing" and
+        event.payload.commonLabels.alertname == "selinux status"
+      action:
+        run_playbook:
+          name: remediate_selinux.yml
