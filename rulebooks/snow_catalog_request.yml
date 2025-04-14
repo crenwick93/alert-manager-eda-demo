@@ -11,7 +11,7 @@
         - ansible.eda.normalize_keys:
   rules:
     - name: alertmanager selinux alert
-      condition: event.meta is defined
+      condition: event is defined
       action:
         debug:
           var: event
