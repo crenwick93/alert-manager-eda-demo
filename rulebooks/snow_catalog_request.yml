@@ -8,8 +8,8 @@
         host: 0.0.0.0
         port: 5000
   rules:
-    - name: Output alert
-      condition: event is defined
+    - name: alertmanager selinux alert
+      condition: event.payload.status == "firing" and event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
           var: event
