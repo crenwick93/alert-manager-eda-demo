@@ -11,7 +11,9 @@
         - ansible.eda.normalize_keys:
   rules:
     - name: test match
-      condition: event.status == "firing"
+      condition: >
+        event.payload.status == "firing" and
+        event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
-          msg: "Event received: {{ event }}"
+          msg: "Event received TEST: {{ event }}"

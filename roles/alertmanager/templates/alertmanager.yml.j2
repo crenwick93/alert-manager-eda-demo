@@ -9,6 +9,6 @@ receivers:
     webhook_configs:
       - url: '{{ eda_webhook_url }}'
         http_config:
-          bearer_token: /etc/alertmanager/eda_token
+          bearer_token: "{{ eda_webhook_token }}"
           tls_config:
             insecure_skip_verify: true
