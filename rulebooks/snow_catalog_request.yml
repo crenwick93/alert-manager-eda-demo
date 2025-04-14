@@ -1,0 +1,18 @@
+---
+- name: Respond to Alert Manager alerts
+  hosts: all
+  execution_strategy: parallel
+  sources:
+    - name: Listen for alerts
+      ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+  rules:
+    - name: Output alert
+      condition: event.meta is defined
+      action:
+        debug:
+          var: event.payload
+
+
+
