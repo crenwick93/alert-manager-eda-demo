@@ -25,4 +25,4 @@
         event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
-          msg: "The selinux issue has been resolved"
+          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance }}"
