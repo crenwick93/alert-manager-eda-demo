@@ -9,7 +9,8 @@
         port: 5000
   rules:
     - name: alertmanager selinux alert
-      condition: event.payload.status == "firing" and event.payload.commonLabels.alertname == "selinux status"
+      condition: event.payload is defined
+      #condition: event.payload.status == "firing" and event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
           var: event
