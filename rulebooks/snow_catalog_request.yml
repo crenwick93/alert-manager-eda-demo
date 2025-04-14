@@ -10,11 +10,11 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    - name: alertmanager selinux alert
-      condition: event is defined
+    - name: test match
+      condition: event.payload is defined
       action:
         debug:
-          var: event
+          msg: "Event received: {{ event.payload }}"
 
 
 
