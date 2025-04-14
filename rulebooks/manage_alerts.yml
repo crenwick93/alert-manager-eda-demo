@@ -10,10 +10,18 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    - name: test match
+    - name: Remediate_selinux issue
       condition: >
         event.payload.status == "firing" and
         event.payload.commonLabels.alertname == "selinux status"
       action:
         run_playbook:
-          name: remediate_selinux.yml
+          name: remediate_selinux
+
+    - name: Log SELinux resolution
+      condition: >
+        event.payload.status == "resolved" and
+        event.payload.commonLabels.alertname == "selinux status"
+      action:
+        debug:
+          msg: "The selinux issue has been resolved"
