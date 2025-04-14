@@ -15,6 +15,3 @@
       action:
         debug:
           msg: "Event received: {{ event }}"
-
-
-
