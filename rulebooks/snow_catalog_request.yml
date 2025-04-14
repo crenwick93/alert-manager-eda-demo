@@ -9,10 +9,10 @@
         port: 5000
   rules:
     - name: Output alert
-      condition: event.meta is defined
+      condition: event is defined
       action:
         debug:
-          var: event.payload
+          var: event
 
 
 
