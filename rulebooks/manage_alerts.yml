@@ -17,6 +17,7 @@
       action:
         run_job_template:
           name: remediate_selinux
+          organization: Default
 
     - name: Log SELinux resolution
       condition: >
