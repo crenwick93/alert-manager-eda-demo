@@ -11,7 +11,7 @@
         - ansible.eda.normalize_keys:
   rules:
     - name: test match
-      condition: event.payload is not none
+      condition: event.status == "firing"
       action:
         debug:
           msg: "Event received: {{ event }}"
