@@ -21,7 +21,7 @@
     - name: Update work notes on incident
       servicenow.itsm.incident:
         sys_id: "{{ snow_result.record.sys_id }}"
-        state: "In Progress"
+        state: 2 # In Progress
         other:
           work_notes: "Attempting remediation with Event Driven Ansible"
       tags: update_incident
