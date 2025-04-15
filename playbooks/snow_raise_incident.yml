@@ -15,9 +15,6 @@
       register: snow_result
       tags: "create_incident"
 
-    - debug:
-        var: snow_result
-
     - name: Update work notes on incident
       servicenow.itsm.incident:
         sys_id: "{{ snow_result.record.sys_id }}"
@@ -25,3 +22,21 @@
         other:
           work_notes: "Attempting remediation with Event Driven Ansible"
       tags: "update_incident"
+      register: incident
+
+    - debug:
+        var: incident
+
+
+
+    # - name: Consolidate all facts and original event into set_stats
+    #   ansible.builtin.set_stats:
+    #     data:
+    #       enriched_event: "{{ enriched_event }}"
+    #       original_event: "{{ req_number | default({}) }}"
+    #       user: "{{ userinfo.record[0].email }}"
+    #       business_purpose: "{{ business_purpose_value }}"
+
+    # - name: Display consolidated enriched_event
+    #   ansible.builtin.debug:
+    #     var: enriched_event
