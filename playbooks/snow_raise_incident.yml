@@ -5,12 +5,13 @@
   gather_facts: false
   tasks:
     - name: Create a ServiceNow incident
-      servicenow.itsm.now_incident:
+      servicenow.itsm.incident:
         state: new
         caller: "System Administrator"
         short_description: "This is an EDA test"
-        # description: "{{ description }}"
-        # severity: "{{ severity }}"
-        # impact: "{{ impact }}"
-        # urgency: "{{ urgency }}"
+        description: "EDA is on this"
+        attachments:
+          - path: path/to/attachment.txt
+        impact: low
+        urgency: low
       register: snow_result
