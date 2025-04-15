@@ -9,11 +9,11 @@
         state: new
         caller: "eda_user"
         short_description: "{{ short_description }}"
-        description: "EDA is on this"
+        description: "{{ description }}"
         impact: low
         urgency: low
       register: snow_result
-      tags: create_incident
+      tags: "create_incident"
 
     - debug:
         var: snow_result
@@ -24,4 +24,4 @@
         state: 2 # In Progress
         other:
           work_notes: "Attempting remediation with Event Driven Ansible"
-      tags: update_incident
+      tags: "update_incident"
