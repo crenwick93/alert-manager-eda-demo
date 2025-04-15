@@ -1,7 +1,7 @@
 ---
 - name: Respond to Alert Manager alerts
   hosts: all
-  match_multiple_rules: true
+  #match_multiple_rules: true
   execution_strategy: parallel
   sources:
     - name: Listen for alerts
@@ -20,21 +20,20 @@
         debug:
           msg: "Issue raised: Selinux issue has been found on {{ event.payload.commonLabels.instance.split(':')[0] }}"
 
-    - name: Remediate selinux issue
-      condition:
-        all:
-          - event.payload.status == "firing"
-          - event.payload.commonLabels.alertname == "selinux status"
-      action:
-        run_job_template:
-          name: remediate_selinux
-          organization: Default
+    # - name: Remediate selinux issue
+    #   condition:
+    #     all:
+    #       - event.payload.status == "firing"
+    #       - event.payload.commonLabels.alertname == "selinux status"
+    #   action:
+    #     run_job_template:
+    #       name: remediate_selinux
+    #       organization: Default
 
-    - name: Log SELinux resolution
-      condition:
-        all:
-          - event.payload.status == "resolved"
-          - event.payload.commonLabels.alertname == "selinux status"
-      action:
-        debug:
-          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+    # - name: Log SELinux resolution
+    #   condition: >
+    #     event.payload.status == "resolved" and
+    #     event.payload.commonLabels.alertname == "selinux status"
+    #   action:
+    #     debug:
+    #       msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
