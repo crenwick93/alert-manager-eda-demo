@@ -1,26 +1,27 @@
 ---
-- name: Raise a Service Now incident
+- name: Manage Service Now incidents
   hosts: localhost
   connection: local
   gather_facts: false
   tasks:
-    # - name: Create a ServiceNow incident
-    #   servicenow.itsm.incident:
-    #     state: new
-    #     caller: "eda_user"
-    #     short_description: "{{ short_description }}"
-    #     description: "EDA is on this"
-    #     impact: low
-    #     urgency: low
-    #   register: snow_result
+    - name: Create a ServiceNow incident
+      servicenow.itsm.incident:
+        state: new
+        caller: "eda_user"
+        short_description: "{{ short_description }}"
+        description: "EDA is on this"
+        impact: low
+        urgency: low
+      register: snow_result
+      tags: create_incident
 
-    # - debug:
-    #     var: snow_result
+    - debug:
+        var: snow_result
 
     - name: Update work notes on incident
       servicenow.itsm.incident:
-        #sys_id: "{{ snow_result.record.sys_id }}"
-        sys_id: "80eaee2fc33422108f8b12d4e4013191"
+        sys_id: "{{ snow_result.record.sys_id }}"
         state: "In Progress"
         other:
-          work_notes: "adding some awesome work notes"
+          work_notes: "Attempting remediation with Event Driven Ansible"
+      tags: update_incident

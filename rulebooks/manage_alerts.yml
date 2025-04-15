@@ -21,9 +21,10 @@
           organization: Default
           post_event: true
           job_args:
+            job_tags: create_incident
             extra_vars:
               short_description: "{{ event.payload.commonAnnotations.summary }}"
-              description: "{{ event.payload.commonAnnotations.description }}"
+              description: "Instance: {{ instance }} - {{ event.payload.commonAnnotations.description }}"
               instance: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
               severity: "{{ event.payload.commonLabels.severity }}"
 
