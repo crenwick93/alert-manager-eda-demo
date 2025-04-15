@@ -31,5 +31,5 @@
       ansible.builtin.set_stats:
         data:
           incident_details: "{{ incident }}"
-          original_event: "{{ event | default({}) }}"
+          original_event: "{{ original_event | default({}) }}"
 

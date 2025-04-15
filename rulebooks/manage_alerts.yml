@@ -19,7 +19,7 @@
         run_job_template:
           name: snow_raise_incident
           organization: Default
-          post_event: true
+          post_events: true
           job_args:
             job_tags: create_incident
             extra_vars:
