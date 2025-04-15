@@ -2,6 +2,7 @@
 - name: Respond to Alert Manager alerts
   hosts: all
   execution_strategy: parallel
+  post_events: true
   sources:
     - name: Listen for alerts
       ansible.eda.webhook:
@@ -10,6 +11,14 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
+    - name: Raise incident
+      condition: >
+        event.payload.status == "firing" and
+        event.payload.commonLabels.alertname == "selinux status"
+      action:
+        debug:
+          msg: "Issue raised: Selinux issue has been found on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+
     - name: Remediate selinux issue
       condition: >
         event.payload.status == "firing" and
@@ -25,4 +34,4 @@
         event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
-          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance }}"
+          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
