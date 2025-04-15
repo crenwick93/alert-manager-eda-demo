@@ -21,4 +21,5 @@
       servicenow.itsm.incident:
         table: incident
         sys_id: "{{ snow_result.record.sys_id }}"
+        state: "In Progress"
         work_notes: "adding some awesome work notes"
