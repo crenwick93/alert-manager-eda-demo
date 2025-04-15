@@ -19,7 +19,6 @@
 
     - name: Update work notes on incident
       servicenow.itsm.incident:
-        table: incident
         #sys_id: "{{ snow_result.record.sys_id }}"
         sys_id: "80eaee2fc33422108f8b12d4e4013191"
         state: "In Progress"
