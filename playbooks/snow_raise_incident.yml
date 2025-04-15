@@ -17,9 +17,8 @@
     - debug:
         var: snow_result
 
-    # - name: Update work notes on incident
-    #   servicenow.itsm.now_record:
-    #     table: incident
-    #     sys_id: "{{ incident_sys_id }}"
-    #     data:
-    #       work_notes: "{{ work_note_message }}"
+    - name: Update work notes on incident
+      servicenow.itsm.incident:
+        table: incident
+        sys_id: "{{ snow_result.record.sys_id }}"
+        work_notes: "adding some awesome work notes"
