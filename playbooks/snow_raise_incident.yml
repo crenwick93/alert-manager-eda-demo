@@ -7,7 +7,7 @@
     - name: Create a ServiceNow incident
       servicenow.itsm.incident:
         state: new
-        caller: "System Administrator"
+        caller: "eda_user"
         short_description: "This is an EDA test"
         description: "EDA is on this"
         attachments:
