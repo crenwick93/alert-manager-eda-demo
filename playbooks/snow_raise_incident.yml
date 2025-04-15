@@ -10,8 +10,6 @@
         caller: "eda_user"
         short_description: "This is an EDA test"
         description: "EDA is on this"
-        attachments:
-          - path: path/to/attachment.txt
         impact: low
         urgency: low
       register: snow_result
