@@ -11,29 +11,30 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    # - name: Raise incident
-    #   condition: >
-    #     event.payload.status == "firing" and
-    #     event.payload.commonLabels.alertname == "selinux status"
-    #   action:
-    #     debug:
-    #       msg: "Issue raised: Selinux issue has been found on {{ event.payload.commonLabels.instance.split(':')[0] }}"
-
-    - name: Raise SNOW incident and remediate selinux issue
-      condition: >
-        event.payload.status == "firing" and
-        event.payload.commonLabels.alertname == "selinux status"
+    - name: Raise incident
+      condition:
+        all:
+          - event.payload.status == "firing"
+          - event.payload.commonLabels.alertname == "selinux status"
       action:
-        - debug:
-            msg: "Issue raised: Selinux issue has been found on {{ event.payload.commonLabels.instance.split(':')[0] }}"
-        - run_job_template:
-            name: remediate_selinux
-            organization: Default
+        debug:
+          msg: "Issue raised: Selinux issue has been found on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+
+    - name: Remediate selinux issue
+      condition:
+        all:
+          - event.payload.status == "firing"
+          - event.payload.commonLabels.alertname == "selinux status"
+      action:
+        run_job_template:
+          name: remediate_selinux
+          organization: Default
 
     - name: Log SELinux resolution
-      condition: >
-        event.payload.status == "resolved" and
-        event.payload.commonLabels.alertname == "selinux status"
+      condition:
+        all:
+          - event.payload.status == "resolved"
+          - event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
           msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
