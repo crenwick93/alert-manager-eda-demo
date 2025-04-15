@@ -1,8 +1,8 @@
 ---
 - name: Respond to Alert Manager alerts
   hosts: all
+  match_multiple_rules: true
   execution_strategy: parallel
-  post_events: true
   sources:
     - name: Listen for alerts
       ansible.eda.webhook:
