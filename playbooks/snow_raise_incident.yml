@@ -1,0 +1,16 @@
+---
+- name: Remediate SELinux mode
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Create a ServiceNow incident
+      servicenow.itsm.now_incident:
+        state: new
+        caller: "System Administrator"
+        short_description: "This is an EDA test"
+        # description: "{{ description }}"
+        # severity: "{{ severity }}"
+        # impact: "{{ impact }}"
+        # urgency: "{{ urgency }}"
+      register: snow_result

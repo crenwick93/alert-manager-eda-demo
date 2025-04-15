@@ -11,29 +11,33 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    - name: Raise incident
-      condition:
-        all:
-          - event.payload.status == "firing"
-          - event.payload.commonLabels.alertname == "selinux status"
+    - name: Raise incident on SNOW
+      condition: >
+        event.payload.status == "firing" and
+        event.payload.commonLabels.alertname == "selinux status"
+      action:
+        run_job_template:
+          name: snow_raise_incident
+          organization: Default
+          post_event: true
+          job_args:
+            extra_vars:
+              req_sys_id: "{{ event.payload.commonAnnotations.summary }}"
+              req_number: "{{ event.payload.number }}"
+
+    - name: Remediate selinux issue
+      condition: >
+        event.payload.status == "firing" and
+        event.payload.commonLabels.alertname == "selinux status"
+      action:
+        run_job_template:
+          name: remediate_selinux
+          organization: Default
+
+    - name: Log SELinux resolution
+      condition: >
+        event.payload.status == "resolved" and
+        event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
-          msg: "Issue raised: Selinux issue has been found on {{ event.payload.commonLabels.instance.split(':')[0] }}"
-
-    # - name: Remediate selinux issue
-    #   condition:
-    #     all:
-    #       - event.payload.status == "firing"
-    #       - event.payload.commonLabels.alertname == "selinux status"
-    #   action:
-    #     run_job_template:
-    #       name: remediate_selinux
-    #       organization: Default
-
-    # - name: Log SELinux resolution
-    #   condition: >
-    #     event.payload.status == "resolved" and
-    #     event.payload.commonLabels.alertname == "selinux status"
-    #   action:
-    #     debug:
-    #       msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
