@@ -22,8 +22,10 @@
           post_event: true
           job_args:
             extra_vars:
-              req_sys_id: "{{ event.payload.commonAnnotations.summary }}"
-              req_number: "{{ event.payload.number }}"
+              short_description: "{{ event.payload.commonAnnotations.summary }}"
+              description: "{{ event.payload.commonAnnotations.description }}"
+              instance: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
+              severity: "{{ event.payload.commonLabels.severity }}"
 
     - name: Remediate selinux issue
       condition: >

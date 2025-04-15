@@ -1,5 +1,5 @@
 ---
-- name: Remediate SELinux mode
+- name: Raise a Service Now incident
   hosts: localhost
   connection: local
   gather_facts: false
@@ -8,8 +8,18 @@
       servicenow.itsm.incident:
         state: new
         caller: "eda_user"
-        short_description: "This is an EDA test"
+        short_description: "{{ short_description }}"
         description: "EDA is on this"
         impact: low
         urgency: low
       register: snow_result
+
+    - debug:
+        var: snow_result
+
+    # - name: Update work notes on incident
+    #   servicenow.itsm.now_record:
+    #     table: incident
+    #     sys_id: "{{ incident_sys_id }}"
+    #     data:
+    #       work_notes: "{{ work_note_message }}"
