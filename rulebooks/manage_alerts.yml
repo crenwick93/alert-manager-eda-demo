@@ -27,20 +27,27 @@
               description: "{{ event.payload.commonAnnotations.description }}"
               instance: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
               severity: "{{ event.payload.commonLabels.severity }}"
+              original_event: "{{ event }}"
 
     - name: Remediate selinux issue
-      condition: >
-        event.payload.status == "firing" and
-        event.payload.commonLabels.alertname == "selinux status"
-      action:
-        run_job_template:
-          name: remediate_selinux
-          organization: Default
-
-    - name: Log SELinux resolution
-      condition: >
-        event.payload.status == "resolved" and
-        event.payload.commonLabels.alertname == "selinux status"
+      condition: event.incident_details is defined
       action:
         debug:
-          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+          msg: "{{ event }}"
+
+    # - name: Remediate selinux issue
+    #   condition: >
+    #     event.payload.status == "firing" and
+    #     event.payload.commonLabels.alertname == "selinux status"
+    #   action:
+    #     run_job_template:
+    #       name: remediate_selinux
+    #       organization: Default
+
+    # - name: Log SELinux resolution
+    #   condition: >
+    #     event.payload.status == "resolved" and
+    #     event.payload.commonLabels.alertname == "selinux status"
+    #   action:
+    #     debug:
+    #       msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"

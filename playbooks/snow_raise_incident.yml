@@ -27,16 +27,9 @@
     - debug:
         var: incident
 
+    - name: Consolidate all facts and original event into set_stats
+      ansible.builtin.set_stats:
+        data:
+          incident_details: "{{ incident }}"
+          original_event: "{{ event | default({}) }}"
 
-
-    # - name: Consolidate all facts and original event into set_stats
-    #   ansible.builtin.set_stats:
-    #     data:
-    #       enriched_event: "{{ enriched_event }}"
-    #       original_event: "{{ req_number | default({}) }}"
-    #       user: "{{ userinfo.record[0].email }}"
-    #       business_purpose: "{{ business_purpose_value }}"
-
-    # - name: Display consolidated enriched_event
-    #   ansible.builtin.debug:
-    #     var: enriched_event
