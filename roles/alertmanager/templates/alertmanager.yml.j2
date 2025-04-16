@@ -1,6 +1,6 @@
 route:
   receiver: eda_webhook
-  repeat_interval: 1m
+  repeat_interval: 10m   # 10 minutes gives EDA a chance to manage the alert, create incident, remediate etc.
   group_wait: 15s
   group_interval: 15s
 
@@ -8,6 +8,7 @@ receivers:
   - name: eda_webhook
     webhook_configs:
       - url: '{{ eda_webhook_url }}'
+        send_resolved: false # Disable resolved alert as we do not need a second trigger to manage resolution.
         http_config:
           bearer_token: "{{ eda_webhook_token }}"
           tls_config:

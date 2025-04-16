@@ -1,5 +1,5 @@
 ---
-- name: Respond to Alert Manager alerts
+- name: Monitor selinux alerts with service now integration
   hosts: all
   #match_multiple_rules: true
   execution_strategy: parallel
@@ -30,24 +30,21 @@
               original_event: "{{ event }}"
 
     - name: Remediate selinux issue
-      condition: event.incident_details is defined
+      condition: event.incident_sys_id is defined # when rulebook is retriggered (after snow incident is created, this should be defined)
+      action:
+        run_job_template:
+          name: remediate_selinux
+          organization: Default
+          post_events: true
+          job_args:
+            extra_vars:
+              target_host: "{{ event.original_event.payload.commonLabels.instance.split(':')[0] }}"
+              incident_sys_id: "{{ event.incident_sys_id }}"
+
+    - name: Log SELinux resolution
+      condition: >
+        event.payload.status == "resolved" and
+        event.payload.commonLabels.alertname == "selinux status"
       action:
         debug:
-          msg: "{{ event }}"
-
-    # - name: Remediate selinux issue
-    #   condition: >
-    #     event.payload.status == "firing" and
-    #     event.payload.commonLabels.alertname == "selinux status"
-    #   action:
-    #     run_job_template:
-    #       name: remediate_selinux
-    #       organization: Default
-
-    # - name: Log SELinux resolution
-    #   condition: >
-    #     event.payload.status == "resolved" and
-    #     event.payload.commonLabels.alertname == "selinux status"
-    #   action:
-    #     debug:
-    #       msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"

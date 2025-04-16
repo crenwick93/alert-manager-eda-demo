@@ -13,7 +13,8 @@
         impact: low
         urgency: low
       register: snow_result
-      tags: "create_incident"
+      tags:
+        - create_incident
 
     - name: Update work notes on incident
       servicenow.itsm.incident:
@@ -21,15 +22,16 @@
         state: 2 # In Progress
         other:
           work_notes: "Attempting remediation with Event Driven Ansible"
-      tags: "update_incident"
+      tags:
+        - update_incident
       register: incident
 
-    - debug:
-        var: incident
+    # - debug:
+    #     var: incident
 
-    - name: Consolidate all facts and original event into set_stats
-      ansible.builtin.set_stats:
-        data:
-          incident_details: "{{ incident }}"
-          original_event: "{{ original_event | default({}) }}"
+    # - name: Consolidate all facts and original event into set_stats
+    #   ansible.builtin.set_stats:
+    #     data:
+    #       incident_sys_id: "{{ incident.record.sys_id }}"
+    #       eda_event: "{{ original_event | default({}) }}"
 
