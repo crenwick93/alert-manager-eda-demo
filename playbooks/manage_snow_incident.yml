@@ -13,7 +13,8 @@
         description: "{{ description }}"
         impact: low
         urgency: low
-        correlation_id: "{{ alert_fingerprint }}"
+        other:
+          correlation_id: "{{ alert_fingerprint }}"
       register: create_incident
       tags:
         - create_incident
