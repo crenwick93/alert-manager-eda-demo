@@ -1,7 +1,6 @@
 ---
 - name: Monitor selinux alerts with service now integration
   hosts: all
-  #match_multiple_rules: true
   execution_strategy: parallel
   sources:
     - name: Listen for alerts
@@ -11,29 +10,25 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    # - name: Raise incident on SNOW
-    #   condition: >
-    #     event.payload.status == "firing" and
-    #     event.payload.commonLabels.alertname == "selinux status"
-    #   action:
-    #     run_job_template:
-    #       name: snow_raise_incident
-    #       organization: Default
-    #       post_events: true
-    #       job_args:
-    #         job_tags: create_incident
-    #         extra_vars:
-    #           short_description: "{{ event.payload.commonAnnotations.summary }}"
-    #           description: "{{ event.payload.commonAnnotations.description }}"
-    #           instance: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
-    #           severity: "{{ event.payload.commonLabels.severity }}"
-    #           original_event: "{{ event }}"
+    # Skip remediation for sandbox hosts
+    - name: Skip remediation for sandbox hosts
+      condition: >
+        event.payload.commonLabels.alertname == "selinux not enforcing" and
+        event.payload.commonLabels.environment == "sandbox"
+      action:
+        debug:
+          msg: "Host {{ event.payload.commonLabels.instance }} is part of the sandbox environment. Skipping remediation."
 
-    - name: Remediate selinux issue
-      condition: event.payload.commonLabels.alertname == "selinux status" # when rulebook is retriggered (after snow incident is created, this should be defined)
+    ######################################################################################################################
+    # Auto-remediate non-production systems
+
+    - name: Auto-remediate non-production systems for selinux issue and report to Service Now # Audit trail in SNOW
+      condition: >
+        event.payload.commonLabels.alertname == "selinux not enforcing" and
+        not event.payload.commonLabels.environment == "prod"
       action:
         run_workflow_template:
-          name: servicenow_full_flow
+          name: servicenow_auto_remediate_selinux_workflow
           organization: Default
           job_args:
             extra_vars:
@@ -44,11 +39,22 @@
               severity: "{{ event.payload.commonLabels.severity }}"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
 
+    ######################################################################################################################
+    # Raise critical incident if host is tagged as production
 
-    # - name: Log SELinux resolution
-    #   condition: >
-    #     event.payload.status == "resolved" and
-    #     event.payload.commonLabels.alertname == "selinux status"
-    #   action:
-    #     debug:
-    #       msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+    - name: Raise critical incident if host is tagged as production
+      condition: >
+        event.payload.commonLabels.alertname == "selinux not enforcing" and
+        event.payload.commonLabels.environment == "prod"
+      action:
+        run_workflow_template:
+          name: servicenow_full_flow
+          organization: Default
+          job_args:
+            extra_vars:
+              target_host: "{{ event.payload.commonLabels.instance }}"
+              short_description: "{{ event.payload.commonAnnotations.summary }}"
+              description: "{{ event.payload.commonAnnotations.description }}"
+              instance: "{{ event.payload.commonLabels.instance }}"
+              severity: "critical"
+              alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"

@@ -1,7 +1,7 @@
 ---
 
 - name: Install node exporter on application server
-  hosts: demo-app
+  hosts: apps
   become: true
   roles:
     - node_exporter

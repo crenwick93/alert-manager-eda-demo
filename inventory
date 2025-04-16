@@ -1,5 +1,5 @@
 [apps]
-demo-app ansible_host=ec2-13-42-39-74.eu-west-2.compute.amazonaws.com
+demo-app-sandbox ansible_host=ec2-13-42-39-74.eu-west-2.compute.amazonaws.com
 
 [monitoring]
 prometheus-am ansible_host=ec2-18-134-98-195.eu-west-2.compute.amazonaws.com
