@@ -11,40 +11,44 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    - name: Raise incident on SNOW
-      condition: >
-        event.payload.status == "firing" and
-        event.payload.commonLabels.alertname == "selinux status"
+    # - name: Raise incident on SNOW
+    #   condition: >
+    #     event.payload.status == "firing" and
+    #     event.payload.commonLabels.alertname == "selinux status"
+    #   action:
+    #     run_job_template:
+    #       name: snow_raise_incident
+    #       organization: Default
+    #       post_events: true
+    #       job_args:
+    #         job_tags: create_incident
+    #         extra_vars:
+    #           short_description: "{{ event.payload.commonAnnotations.summary }}"
+    #           description: "{{ event.payload.commonAnnotations.description }}"
+    #           instance: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
+    #           severity: "{{ event.payload.commonLabels.severity }}"
+    #           original_event: "{{ event }}"
+
+    - name: Remediate selinux issue
+      condition: event.payload.commonLabels.alertname == "selinux status" # when rulebook is retriggered (after snow incident is created, this should be defined)
       action:
-        run_job_template:
-          name: snow_raise_incident
+        run_workflow_template:
+          name: servicenow_full_flow
           organization: Default
-          post_events: true
           job_args:
-            job_tags: create_incident
             extra_vars:
+              target_host: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
               short_description: "{{ event.payload.commonAnnotations.summary }}"
               description: "{{ event.payload.commonAnnotations.description }}"
               instance: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
               severity: "{{ event.payload.commonLabels.severity }}"
-              original_event: "{{ event }}"
+              alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
 
-    - name: Remediate selinux issue
-      condition: event.incident_sys_id is defined # when rulebook is retriggered (after snow incident is created, this should be defined)
-      action:
-        run_job_template:
-          name: remediate_selinux
-          organization: Default
-          post_events: true
-          job_args:
-            extra_vars:
-              target_host: "{{ event.original_event.payload.commonLabels.instance.split(':')[0] }}"
-              incident_sys_id: "{{ event.incident_sys_id }}"
 
-    - name: Log SELinux resolution
-      condition: >
-        event.payload.status == "resolved" and
-        event.payload.commonLabels.alertname == "selinux status"
-      action:
-        debug:
-          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+    # - name: Log SELinux resolution
+    #   condition: >
+    #     event.payload.status == "resolved" and
+    #     event.payload.commonLabels.alertname == "selinux status"
+    #   action:
+    #     debug:
+    #       msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
