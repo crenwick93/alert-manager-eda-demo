@@ -17,13 +17,13 @@
       tags:
         - create_incident
 
-    # - name: Consolidate all facts and original event into set_stats
-    #   ansible.builtin.set_stats:
-    #     data:
-    #       incident_sys_id: "{{ create_incident.record.sys_id }}"
-    #       eda_event: "{{ original_event | default({}) }}"
-    #   tags:
-    #     - create_incident
+    - name: Consolidate all facts and original event into set_stats
+      ansible.builtin.set_stats:
+        data:
+          incident_sys_id: "{{ create_incident.record.sys_id }}"
+          eda_event: "{{ original_event | default({}) }}"
+      tags:
+        - create_incident
 
     ################################################################################################
 
