@@ -46,7 +46,7 @@
         sys_id: "{{ incident_sys_id }}"
         state: 6  # 6 = Resolved
         close_notes: "Issue automatically resolved by Event-Driven Ansible"
-        close_code: "Solved (Known Error)"
+        close_code: "eda_resolved"
       tags:
         - resolve_incident
       register: resolve_incident
