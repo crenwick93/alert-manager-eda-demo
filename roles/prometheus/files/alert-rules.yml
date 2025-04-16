@@ -7,6 +7,8 @@ groups:
     expr: node_selinux_current_mode == 0
     labels:
       severity: warning
+      alertname: selinux status
+      instance: '{{ $labels.instance | regexReplace ":.*", "" }}'  # 👈 Strips :9100 for clear demo purposes
     annotations:
       summary: "Selinux is disabled on {{ $labels.instance }}"
       description: "Selinux has been set to permissive on {{ $labels.instance }}"
@@ -15,6 +17,8 @@ groups:
     expr: node_systemd_unit_state{state="failed"} == 1
     labels:
       severity: warning
+      alertname: systemd failed service
+      instance: '{{ $labels.instance | regexReplace ":.*", "" }}'
     annotations:
       summary: "Host systemd service failed (instance {{ $labels.instance }})"
       description: "systemd service failed\n  VALUE = {{ $value }}"

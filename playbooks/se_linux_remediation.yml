@@ -1,6 +1,5 @@
 ---
 - name: Remediate SELinux mode
-  # hosts: "{{ ansible_eda.event.payload.commonLabels.instance.split(':')[0] }}"
   hosts: "{{ target_host }}"
   become: yes
   pre_tasks:

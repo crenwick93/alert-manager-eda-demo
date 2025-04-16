@@ -37,10 +37,10 @@
           organization: Default
           job_args:
             extra_vars:
-              target_host: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
+              target_host: "{{ event.payload.commonLabels.instance }}"
               short_description: "{{ event.payload.commonAnnotations.summary }}"
               description: "{{ event.payload.commonAnnotations.description }}"
-              instance: "{{ event.payload.commonLabels.instance.split(':')[0] }}"
+              instance: "{{ event.payload.commonLabels.instance }}"
               severity: "{{ event.payload.commonLabels.severity }}"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
 
