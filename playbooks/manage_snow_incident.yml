@@ -46,7 +46,8 @@
         sys_id: "{{ incident_sys_id }}"
         state: 6  # 6 = Resolved
         close_notes: "Issue automatically resolved by Event-Driven Ansible"
-        close_code: "eda_resolved"
+        close_code: "eda_resolved" # custom created close code (System Definition > Choice Lists) in SNOW
+        resolved_by: "eda_user"
       tags:
         - resolve_incident
       register: resolve_incident
