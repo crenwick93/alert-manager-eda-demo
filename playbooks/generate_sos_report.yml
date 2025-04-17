@@ -30,7 +30,7 @@
         flat: yes
 
     - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
-      ansible.builtin.stat:
+      ansible.set_stats.stat:
         data:
           sos_report_generated: true
 
