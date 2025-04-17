@@ -53,7 +53,7 @@
           path: "{{ sos_report_path }}"
       tags:
         - update_incident
-      when: sos_report_path.exists
+      when: sos_report_path is defined
 
 
     ################################################################################################
