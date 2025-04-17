@@ -4,6 +4,9 @@
   connection: local
   gather_facts: false
   tasks:
+    ################################################################################################
+    ##############################   CREATING INCIDENTS  ###########################################
+
     # Create ServiceNow incident and set incident_sys_id so it's accessible in workflow or rulebook
     - name: Create a ServiceNow incident
       servicenow.itsm.incident:
@@ -28,6 +31,7 @@
         - create_incident
 
     ################################################################################################
+    ##############################   UPDATING INCIDENTS  ###########################################
 
     # Update state and work notes on ServiceNow incident
     - name: Update state and work notes on ServiceNow incident
@@ -35,12 +39,27 @@
         sys_id: "{{ incident_sys_id }}"
         state: 2 # In Progress
         other:
-          work_notes: "Attempting remediation with Event Driven Ansible"
+          work_notes: "{{ work_notes }}"
       tags:
         - update_incident
       register: update_incident
 
+    # Attach sos report if one has been generated
+    - name: Update state and work notes on ServiceNow incident
+      servicenow.itsm.incident:
+        sys_id: "{{ incident_sys_id }}"
+        attachments:
+          name: sos_report_{{ instance }}
+          path: "{{ sos_report_path }}"
+        other:
+          work_notes: "{{ work_notes }}"
+      tags:
+        - update_incident
+      when: sos_report_path.exists
+
+
     ################################################################################################
+    ##############################   RESOLVING INCIDENTS  ###########################################
 
     # Resolve the ServiceNow incident with resolution information
     - name: Resolve the ServiceNow incident

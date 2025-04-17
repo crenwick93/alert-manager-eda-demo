@@ -1,0 +1,30 @@
+---
+- name: Generate sosreport on target host
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    sos_output_dir: "/var/tmp"
+  tasks:
+    - name: Ensure sos package is installed and up to date
+      ansible.builtin.package:
+        name: sos
+        state: latest
+
+    - name: Run sosreport
+      ansible.builtin.command: sosreport --batch --tmp-dir {{ sos_output_dir }}
+      register: sos_output
+      changed_when: "'sosreport' in sos_output.stdout"
+
+    - name: Extract sosreport archive path from output
+      ansible.builtin.set_fact:
+        sosreport_path: "{{ sos_output.stdout_lines | select('search', 'sosreport-') | list | first | regex_search('(/.+?\.tar\.xz)', '\\1') }}"
+
+    - name: Display generated sosreport path
+      ansible.builtin.debug:
+        msg: "sosreport created at {{ sosreport_path }}"
+
+    - name: Check if sosreport exists
+      ansible.builtin.stat:
+        data:
+          sos_report_path: "{{ sosreport_path }}"

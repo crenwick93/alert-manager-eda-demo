@@ -37,6 +37,7 @@
               description: "{{ event.payload.commonAnnotations.description }}"
               instance: "{{ event.payload.commonLabels.instance }}"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
+              work_notes: "Attempting remediation with Event Driven Ansible"
               # Low impact and urgency due to it being a production incident
               impact: 3 # 1 = High
               urgency: 3
@@ -50,7 +51,7 @@
         event.payload.commonLabels.environment == "prod"
       action:
         run_workflow_template:
-          name: servicenow_auto_remediate_selinux_workflow
+          name: servicenow_prod_selinux_workflow
           organization: Default
           job_args:
             extra_vars:
@@ -59,6 +60,10 @@
               description: "{{ event.payload.commonAnnotations.description }}"
               instance: "{{ event.payload.commonLabels.instance }}"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
+              work_notes: >
+                "###########################################################################################################################"
+                "Event Driven Ansible cannot autoremediate as this is a production server. Diagnostics have been run and sosreport attached"
+                "###########################################################################################################################"
               # High impact and urgency due to it being a production incident
               impact: 1 # 1 = High
               urgency: 1
