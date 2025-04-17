@@ -55,7 +55,7 @@
           work_notes: "{{ work_notes }}"
       tags:
         - update_incident
-      when: sos_report_generated | default(false) | bool
+      when: sos_report_path.exists
 
 
     ################################################################################################

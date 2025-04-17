@@ -32,9 +32,5 @@
     - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
       ansible.builtin.set_stats:
         data:
-          sos_report_generated: true
+          sos_report_path: "{{ sos_file.files[0].path }}"
 
-    - name: List sosreport directory on localhost
-      ansible.builtin.command: ls -lh /tmp/sosreports/
-      delegate_to: localhost
-      run_once: true
