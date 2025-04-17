@@ -51,7 +51,7 @@
         event.payload.commonLabels.environment == "prod"
       action:
         run_workflow_template:
-          name: servicenow_prod_selinux_workflow
+          name: prod_servicenow_enrich_incident_workflow
           organization: Default
           job_args:
             extra_vars:

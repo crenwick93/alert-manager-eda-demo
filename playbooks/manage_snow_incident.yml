@@ -51,8 +51,6 @@
         attachments:
           name: sos_report_{{ instance }}
           path: "{{ sos_report_path }}"
-        other:
-          work_notes: "{{ work_notes }}"
       tags:
         - update_incident
       when: sos_report_path.exists
