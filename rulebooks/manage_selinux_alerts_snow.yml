@@ -25,7 +25,7 @@
     - name: Auto-remediate non-production systems for selinux issue and report to Service Now # Audit trail in SNOW
       condition: >
         event.payload.commonLabels.alertname == "selinux not enforcing" and
-        not event.payload.commonLabels.environment == "prod"
+        event.payload.commonLabels.environment not in ["sandbox", "prod"]
       action:
         run_workflow_template:
           name: servicenow_auto_remediate_selinux_workflow
@@ -36,8 +36,10 @@
               short_description: "{{ event.payload.commonAnnotations.summary }}"
               description: "{{ event.payload.commonAnnotations.description }}"
               instance: "{{ event.payload.commonLabels.instance }}"
-              severity: "{{ event.payload.commonLabels.severity }}"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
+              # Low impact and urgency due to it being a production incident
+              impact: 3 # 1 = High
+              urgency: 3
 
     ######################################################################################################################
     # Raise critical incident if host is tagged as production
@@ -56,5 +58,7 @@
               short_description: "{{ event.payload.commonAnnotations.summary }}"
               description: "{{ event.payload.commonAnnotations.description }}"
               instance: "{{ event.payload.commonLabels.instance }}"
-              severity: "critical"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
+              # High impact and urgency due to it being a production incident
+              impact: 1 # 1 = High
+              urgency: 1

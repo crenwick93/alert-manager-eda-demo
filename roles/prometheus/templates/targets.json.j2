@@ -4,7 +4,7 @@
     "targets": ["{{ hostvars[host].ansible_host }}:9100"],
     "labels": {
       "instance": "{{ host }}",
-      "environment": "{% if 'sandbox' in host %}sandbox{% elif 'prod' in host %}prod{% else %}unknown{% endif %}"
+      "environment": "{% if 'sandbox' in host %}sandbox{% elif 'prod' in host %}prod{% else %}non-prod{% endif %}"
     }
   }{% if not loop.last %},{% endif %}
 {% endfor %}
