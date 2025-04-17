@@ -1,6 +1,6 @@
 ---
 - name: Generate sosreport on target host
-  hosts: all
+  hosts: "{{ target_host }}"
   become: true
   gather_facts: false
   vars:
