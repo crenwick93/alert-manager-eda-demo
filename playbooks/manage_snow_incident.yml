@@ -44,6 +44,11 @@
         - update_incident
       register: update_incident
 
+    - name: Stat the sos report
+      ansible.builtin.stat:
+        path: "{{ sos_report_path }}"
+      register: sos_file_check
+
     # Attach sos report if one has been generated
     - name: Upload sosreport if one has been generated
       servicenow.itsm.incident:

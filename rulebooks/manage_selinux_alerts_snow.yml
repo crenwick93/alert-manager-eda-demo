@@ -61,9 +61,8 @@
               instance: "{{ event.payload.commonLabels.instance }}"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
               work_notes: >
-                "###########################################################################################################################"
+                "###################################################################################"
                 "Event Driven Ansible cannot autoremediate as this is a production server. Diagnostics have been run and sosreport attached"
-                "###########################################################################################################################"
               # High impact and urgency due to it being a production incident
               impact: 1 # 1 = High
               urgency: 1
