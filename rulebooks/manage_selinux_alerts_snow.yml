@@ -20,7 +20,7 @@
           msg: "Host {{ event.payload.commonLabels.instance }} is part of the sandbox environment. Skipping remediation."
 
     ######################################################################################################################
-    # Auto-remediate non-production systems
+    # Auto-remediate non-production systems (I.E a test environment)
 
     - name: Auto-remediate non-production systems for selinux issue and report to Service Now # Audit trail in SNOW
       condition: >
@@ -50,7 +50,7 @@
         event.payload.commonLabels.environment == "prod"
       action:
         run_workflow_template:
-          name: servicenow_full_flow
+          name: servicenow_auto_remediate_selinux_workflow
           organization: Default
           job_args:
             extra_vars:
