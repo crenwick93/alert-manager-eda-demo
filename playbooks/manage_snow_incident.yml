@@ -52,6 +52,9 @@
         - update_incident
       register: update_incident
 
+    - name: debug
+      command: ls /tmp/sosreports/
+
     # Attach sos report if one has been generated
     - name: Upload sosreport if one has been generated
       servicenow.itsm.incident:
