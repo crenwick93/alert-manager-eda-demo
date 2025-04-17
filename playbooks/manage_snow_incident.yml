@@ -14,8 +14,8 @@
         caller: "eda_user"
         short_description: "{{ short_description }}"
         description: "{{ description }}"
-        impact: "{{ impact | default('low') }}"
-        urgency: "{{ urgency | default('low') }}"
+        impact: "{{ impact }}"
+        urgency: "{{ urgency }}"
         other:
           correlation_id: "{{ alert_fingerprint }}"
       register: create_incident
