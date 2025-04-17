@@ -45,12 +45,12 @@
       register: update_incident
 
     # Attach sos report if one has been generated
-    - name: Update state and work notes on ServiceNow incident
+    - name: Upload sosreport if one has been generated
       servicenow.itsm.incident:
         sys_id: "{{ incident_sys_id }}"
         attachments:
-          name: sos_report_{{ instance }}
-          path: "{{ sos_report_path }}"
+          - name: sos_report_{{ instance }}
+            path: "{{ sos_report_path }}"
       tags:
         - update_incident
       when: sos_report_path is defined
