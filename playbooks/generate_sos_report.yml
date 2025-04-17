@@ -29,7 +29,7 @@
         sys_id: "{{ incident_sys_id }}"
         attachments:
           - name: sos_report_{{ instance }}
-            path: "{{ {{ sos_file.files[0].path }}}}"
+            path: "{{ sos_file.files[0].path }}"
       when: incident_sys_id is defined
 
     # - name: Fetch sosreport to controller
@@ -42,4 +42,3 @@
     #   ansible.builtin.set_stats:
     #     data:
     #       sos_report_path: "{{ sos_file.files[0].path }}"
-
