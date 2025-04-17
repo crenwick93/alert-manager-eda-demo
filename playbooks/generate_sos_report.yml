@@ -13,19 +13,28 @@
         state: latest
 
     - name: Run sosreport
-      ansible.builtin.command: sosreport --batch --tmp-dir {{ sos_output_dir }}
-      register: sos_output
-      changed_when: "'sosreport' in sos_output.stdout"
+      command: sosreport --batch --tmp-dir /tmp
+      register: sos_out
 
-    - name: Extract sosreport archive path from output
-      ansible.builtin.set_fact:
-        sosreport_path: "{{ sos_output.stdout_lines | select('search', 'sosreport-') | list | first | regex_search('(/.+?\.tar\.xz)', '\\1') }}"
+    - name: Find generated sosreport file
+      find:
+        paths: /tmp
+        patterns: "sosreport*.tar.xz"
+        recurse: no
+      register: sos_file
 
-    - name: Display generated sosreport path
-      ansible.builtin.debug:
-        msg: "sosreport created at {{ sosreport_path }}"
+    - name: Fetch sosreport to controller
+      ansible.builtin.fetch:
+        src: "{{ sos_file.files[0].path }}"
+        dest: "/tmp/sosreports/"
+        flat: yes
 
-    - name: Check if sosreport exists
+    - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
       ansible.builtin.stat:
         data:
-          sos_report_path: "{{ sosreport_path }}"
+          sos_report_generated: true
+
+    - name: List sosreport directory on localhost
+      ansible.builtin.command: ls -lh /tmp/sos_reports/
+      delegate_to: localhost
+      run_once: true
