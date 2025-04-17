@@ -28,7 +28,7 @@
       servicenow.itsm.incident:
         sys_id: "{{ incident_sys_id }}"
         attachments:
-          - name: sos_report_{{ instance }}
+          - name: sos_report
             path: "{{ sos_file.files[0].path }}"
       when: incident_sys_id is defined
 
