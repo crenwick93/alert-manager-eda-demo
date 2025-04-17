@@ -35,6 +35,6 @@
           sos_report_generated: true
 
     - name: List sosreport directory on localhost
-      ansible.builtin.command: ls -lh /tmp/sos_reports/
+      ansible.builtin.command: ls -lh /tmp/sosreports/
       delegate_to: localhost
       run_once: true
