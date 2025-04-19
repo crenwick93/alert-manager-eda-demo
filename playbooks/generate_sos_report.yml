@@ -4,8 +4,6 @@
   hosts: ec2-18-171-226-11.eu-west-2.compute.amazonaws.com
   become: true
   gather_facts: false
-  vars:
-    sos_output_dir: "/var/tmp"
   tasks:
     - name: Ensure sos package is installed and up to date
       ansible.builtin.package:
