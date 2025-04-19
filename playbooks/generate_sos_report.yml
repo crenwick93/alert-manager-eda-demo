@@ -41,10 +41,10 @@
         dest: "/tmp/"
         flat: yes
 
-    # - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
-    #   ansible.builtin.set_stats:
-    #     data:
-    #       sos_report_path: "{{ sos_file.files[0].path }}"
+    - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
+      ansible.builtin.set_stats:
+        data:
+          sos_report_path: "{{ sos_file.files[0].path }}"
 
     ################################################################################################
     ##############################   UPLOAD CONTENT TO SERVICE NOW (IF REQUIRED) ###########################################
@@ -59,6 +59,6 @@
         #sys_id: 98370b7cc3c1a6108f8b12d4e40131d0
         attachments:
           - name: sos_report
-            path: "{{ sos_file.files[0].path }}"
+            path: "{{ sos_report_path }}"
             #path: /tmp/sos-test.txt
       #when: incident_sys_id is defined
