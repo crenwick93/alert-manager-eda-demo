@@ -44,6 +44,14 @@
         - update_incident
       register: update_incident
 
+    - name: Copy sosreport from remote to local with copy
+      ansible.builtin.copy:
+        src: "{{ sos_report_path }}"
+        dest: /tmp/
+      delegate_to: "{{ target_host }}"
+      tags:
+        - update_incident
+
     - name: test
       command: "ls /tmp/"
       register: test
@@ -60,16 +68,16 @@
       tags:
         - update_incident
 
-    # Download sos report to localhsot if one has been generated
-    - name: Fetch sosreport from {{ target_host }} to local
-      ansible.builtin.fetch:
-        src: "{{ sos_report_path }}"
-        dest: "/tmp/sosreports/"
-        flat: yes
-      delegate_to: "{{ target_host }}"
-      when: sos_report_path is defined
-      tags:
-        - update_incident
+    # # Download sos report to localhsot if one has been generated
+    # - name: Fetch sosreport from {{ target_host }} to local
+    #   ansible.builtin.fetch:
+    #     src: "{{ sos_report_path }}"
+    #     dest: "/tmp/sosreports/"
+    #     flat: yes
+    #   delegate_to: "{{ target_host }}"
+    #   when: sos_report_path is defined
+    #   tags:
+    #     - update_incident
 
     # Attach sos report if one has been generated
     - name: Upload sosreport if one has been generated
