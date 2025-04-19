@@ -5,43 +5,60 @@
   become: true
   gather_facts: false
   tasks:
-    # - name: Ensure sos package is installed and up to date
-    #   ansible.builtin.package:
-    #     name: sos
-    #     state: latest
+    - name: Ensure sos package is installed and up to date
+      ansible.builtin.package:
+        name: sos
+        state: latest
 
-    # - name: Run sosreport
-    #   command: sosreport --batch --tmp-dir /tmp
-    #   register: sos_out
+    - name: Run sosreport
+      command: sosreport --batch --tmp-dir /tmp
+      register: sos_out
 
-    # - name: Find generated sosreport file
-    #   find:
-    #     paths: /tmp
-    #     patterns: "sosreport*.tar.xz"
-    #     recurse: no
-    #   register: sos_file
+    - name: Find generated sosreport file
+      find:
+        paths: /tmp
+        patterns: "sosreport*.tar.xz"
+        recurse: no
+      register: sos_file
 
-    - name: create test sos file
-      command: touch /tmp/sos-test
+    # - name: create test sos file
+    #   command: touch /tmp/sos-test
 
     # Attach sos report if one has been generated
-    - name: Upload sos report to ServiceNow incident
-      servicenow.itsm.incident:
-        #sys_id: "{{ incident_sys_id }}"
-        sys_id: 98370b7cc3c1a6108f8b12d4e40131d0
-        attachments:
-          - name: sos_report
-            #path: "{{ sos_file.files[0].path }}"
-            path: /tmp/sos-test
-      #when: incident_sys_id is defined
+    # - name: Upload sos report to ServiceNow incident
+    #   servicenow.itsm.incident:
+    #     #sys_id: "{{ incident_sys_id }}"
+    #     sys_id: 98370b7cc3c1a6108f8b12d4e40131d0
+    #     attachments:
+    #       - name: sos_report
+    #         #path: "{{ sos_file.files[0].path }}"
+    #         path: /tmp/sos-test
+    #   when: incident_sys_id is defined
 
-    # - name: Fetch sosreport to controller
-    #   ansible.builtin.fetch:
-    #     src: "{{ sos_file.files[0].path }}"
-    #     dest: "/tmp/sosreports/"
-    #     flat: yes
+    - name: Fetch sosreport to controller
+      ansible.builtin.fetch:
+        src: "{{ sos_file.files[0].path }}"
+        dest: "/tmp/"
+        flat: yes
 
     # - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
     #   ansible.builtin.set_stats:
     #     data:
     #       sos_report_path: "{{ sos_file.files[0].path }}"
+
+    ################################################################################################
+    ##############################   UPLOAD CONTENT TO SERVICE NOW (IF REQUIRED) ###########################################
+- name: Upload sosreport to ServiceNow
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    # Attach sos report if one has been generated
+    - name: Upload sos report to ServiceNow incident
+      servicenow.itsm.incident:
+        sys_id: "{{ incident_sys_id }}"
+        #sys_id: 98370b7cc3c1a6108f8b12d4e40131d0
+        attachments:
+          - name: sos_report
+            path: "{{ sos_file.files[0].path }}"
+            #path: /tmp/sos-test.txt
+      #when: incident_sys_id is defined
