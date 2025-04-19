@@ -48,6 +48,7 @@
       ansible.builtin.slurp:
         src: "{{ sos_report_path }}"
       delegate_to: "{{ target_host }}"
+      become: true
       register: sos_report_slurped
       when: sos_report_path is defined
       tags:
