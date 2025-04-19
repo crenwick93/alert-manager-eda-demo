@@ -5,21 +5,21 @@
   become: true
   gather_facts: false
   tasks:
-    - name: Ensure sos package is installed and up to date
-      ansible.builtin.package:
-        name: sos
-        state: latest
+    # - name: Ensure sos package is installed and up to date
+    #   ansible.builtin.package:
+    #     name: sos
+    #     state: latest
 
-    - name: Run sosreport
-      command: sosreport --batch --tmp-dir /tmp
-      register: sos_out
+    # - name: Run sosreport
+    #   command: sosreport --batch --tmp-dir /tmp
+    #   register: sos_out
 
-    - name: Find generated sosreport file
-      find:
-        paths: /tmp
-        patterns: "sosreport*.tar.xz"
-        recurse: no
-      register: sos_file
+    # - name: Find generated sosreport file
+    #   find:
+    #     paths: /tmp
+    #     patterns: "sosreport*.tar.xz"
+    #     recurse: no
+    #   register: sos_file
 
     - name: create test sos file
       command: touch /tmp/sos-test
@@ -27,7 +27,8 @@
     # Attach sos report if one has been generated
     - name: Upload sos report to ServiceNow incident
       servicenow.itsm.incident:
-        sys_id: "{{ incident_sys_id }}"
+        #sys_id: "{{ incident_sys_id }}"
+        sys_id: 98370b7cc3c1a6108f8b12d4e40131d0
         attachments:
           - name: sos_report
             #path: "{{ sos_file.files[0].path }}"
