@@ -33,7 +33,7 @@
           - name: sos_report
             #path: "{{ sos_file.files[0].path }}"
             path: /tmp/sos-test
-      when: incident_sys_id is defined
+      #when: incident_sys_id is defined
 
     # - name: Fetch sosreport to controller
     #   ansible.builtin.fetch:
