@@ -21,14 +21,14 @@
         recurse: no
       register: sos_file
 
-    # # Attach sos report if one has been generated
-    # - name: Upload sos report to ServiceNow incident
-    #   servicenow.itsm.incident:
-    #     sys_id: "{{ incident_sys_id }}"
-    #     attachments:
-    #       - name: sos_report
-    #         path: "{{ sos_file.files[0].path }}"
-    #   when: incident_sys_id is defined
+    # Attach sos report if one has been generated
+    - name: Upload sos report to ServiceNow incident
+      servicenow.itsm.incident:
+        sys_id: "{{ incident_sys_id }}"
+        attachments:
+          - name: sos_report
+            path: "{{ sos_file.files[0].path }}"
+      when: incident_sys_id is defined
 
     # - name: Fetch sosreport to controller
     #   ansible.builtin.fetch:

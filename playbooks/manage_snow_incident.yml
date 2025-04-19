@@ -120,35 +120,35 @@
 
     ################################################################################################
     ##############################   Uploading content to INCIDENTS  ###########################################
-- name: Pull sosreport from remote
-  hosts: "{{ target_host }}"
-  become: true
-  gather_facts: false
-  tasks:
-    - name: Fetch sosreport from target host to controller
-      ansible.builtin.fetch:
-        src: "{{ sos_report_path }}"
-        dest: "/tmp/sosreports/"
-        flat: yes
-      delegate_to: "localhost"
-      when: sos_report_path is defined
+# - name: Pull sosreport from remote
+#   hosts: "{{ target_host }}"
+#   become: true
+#   gather_facts: false
+#   tasks:
+#     - name: Fetch sosreport from target host to controller
+#       ansible.builtin.fetch:
+#         src: "{{ sos_report_path }}"
+#         dest: "/tmp/sosreports/"
+#         flat: yes
+#       delegate_to: "localhost"
+#       when: sos_report_path is defined
 
-    - name: test cmd
-      command: "ls /tmp"
-      register: test
+#     - name: test cmd
+#       command: "ls /tmp"
+#       register: test
 
-    - name: test
-      debug:
-        var: test
+#     - name: test
+#       debug:
+#         var: test
 
-    # Attach sos report if one has been generated
-    - name: Upload sosreport if one has been generated
-      servicenow.itsm.incident:
-        sys_id: "{{ incident_sys_id }}"
-        attachments:
-          - name: sos_report_{{ instance }}
-            path: "{{ sos_report_path }}"
-      when: sos_report_path is defined
-      delegate_to: localhost
-      tags:
-        - update_incident
+#     # Attach sos report if one has been generated
+#     - name: Upload sosreport if one has been generated
+#       servicenow.itsm.incident:
+#         sys_id: "{{ incident_sys_id }}"
+#         attachments:
+#           - name: sos_report_{{ instance }}
+#             path: "{{ sos_report_path }}"
+#       when: sos_report_path is defined
+#       delegate_to: localhost
+#       tags:
+#         - update_incident
