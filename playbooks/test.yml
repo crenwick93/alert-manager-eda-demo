@@ -5,7 +5,7 @@
   tasks:
     - name: Fetch sosreport
       ansible.builtin.fetch:
-        src: /tmp/sos-test
+        src: /tmp/sos-test.txt
         dest: "/tmp/"
         flat: yes
 
@@ -21,5 +21,5 @@
         attachments:
           - name: sos_report
             #path: "{{ sos_file.files[0].path }}"
-            path: /tmp/sos-test
+            path: /tmp/sos-test.txt
       #when: incident_sys_id is defined
