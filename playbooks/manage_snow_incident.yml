@@ -44,13 +44,18 @@
         - update_incident
       register: update_incident
 
-    - name: Copy sosreport from remote to local with copy
-      ansible.builtin.copy:
+    - name: Slurp sosreport from remote host
+      ansible.builtin.slurp:
         src: "{{ sos_report_path }}"
-        dest: /tmp/
       delegate_to: "{{ target_host }}"
-      tags:
-        - update_incident
+      register: sos_report_slurped
+      when: sos_report_path is defined
+
+    - name: Save slurped sosreport to local disk
+      copy:
+        content: "{{ sos_report_slurped.content | b64decode }}"
+        dest: "/tmp/{{ sos_report_path | basename }}"
+      when: sos_report_path is defined
 
     - name: test
       command: "ls /tmp/"
