@@ -44,6 +44,22 @@
         - update_incident
       register: update_incident
 
+    - name: test
+      command: "ls {{ sos_report_path }}"
+      register: test
+      delegate_to: "{{ target_host }}"
+      when: sos_report_path is defined
+      tags:
+        - update_incident
+
+    - name: test print
+      debug:
+        var: test
+      delegate_to: "{{ target_host }}"
+      when: sos_report_path is defined
+      tags:
+        - update_incident
+
     # Download sos report to localhsot if one has been generated
     - name: Fetch sosreport from {{ target_host }} to local
       ansible.builtin.fetch:
