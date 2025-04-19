@@ -38,7 +38,7 @@
     #     dest: "/tmp/sosreports/"
     #     flat: yes
 
-    # - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
-    #   ansible.builtin.set_stats:
-    #     data:
-    #       sos_report_path: "{{ sos_file.files[0].path }}"
+    - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
+      ansible.builtin.set_stats:
+        data:
+          sos_report_path: "{{ sos_file.files[0].path }}"

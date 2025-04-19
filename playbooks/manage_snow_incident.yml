@@ -44,27 +44,27 @@
         - update_incident
       register: update_incident
 
-    # - name: Stat the sos report
-    #   ansible.builtin.stat:
-    #     path: "{{ sos_report_path }}"
-    #   register: sos_file_check
-    #   tags:
-    #     - update_incident
-    #   register: update_incident
+    # Download sos report to localhsot if one has been generated
+    - name: Fetch sosreport from {{ target_host }} to local
+      ansible.builtin.fetch:
+        src: "{{ sos_report_path }}"
+        dest: "/tmp/sosreports/"
+        flat: yes
+      delegate_to: "{{ target_host }}"
+      when: sos_report_path is defined
+      tags:
+        - update_incident
 
-    # - name: debug
-    #   command: ls /tmp/sosreports/
-
-    # # Attach sos report if one has been generated
-    # - name: Upload sosreport if one has been generated
-    #   servicenow.itsm.incident:
-    #     sys_id: "{{ incident_sys_id }}"
-    #     attachments:
-    #       - name: sos_report_{{ instance }}
-    #         path: "{{ sos_report_path }}"
-    #   tags:
-    #     - update_incident
-    #   when: sos_report_path is defined
+    # Attach sos report if one has been generated
+    - name: Upload sosreport if one has been generated
+      servicenow.itsm.incident:
+        sys_id: "{{ incident_sys_id }}"
+        attachments:
+          - name: sos_report_{{ instance }}
+            path: "{{ sos_report_path }}"
+      when: sos_report_path is defined
+      tags:
+        - update_incident
 
 
     ################################################################################################
