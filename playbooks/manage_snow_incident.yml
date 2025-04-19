@@ -45,7 +45,7 @@
       register: update_incident
 
     - name: test
-      command: "ls {{ sos_report_path }}"
+      command: "ls /tmp/"
       register: test
       delegate_to: "{{ target_host }}"
       when: sos_report_path is defined
