@@ -50,12 +50,16 @@
       delegate_to: "{{ target_host }}"
       register: sos_report_slurped
       when: sos_report_path is defined
+      tags:
+        - update_incident
 
     - name: Save slurped sosreport to local disk
       copy:
         content: "{{ sos_report_slurped.content | b64decode }}"
         dest: "/tmp/{{ sos_report_path | basename }}"
       when: sos_report_path is defined
+      tags:
+        - update_incident
 
     - name: test
       command: "ls /tmp/"
