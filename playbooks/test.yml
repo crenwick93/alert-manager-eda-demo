@@ -1,0 +1,12 @@
+---
+- name: TEST
+  hosts: ec2-18-171-226-11.eu-west-2.compute.amazonaws.com
+  gather_facts: false
+  tasks:
+    - name: test cmd
+      command: "ls /tmp"
+      register: test
+
+    - name: test
+      debug:
+        var: test
