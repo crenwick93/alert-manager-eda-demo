@@ -1,7 +1,7 @@
 ---
 - name: Generate sosreport on target host
-  #hosts: "{{ target_host }}"
-  hosts: ec2-18-171-226-11.eu-west-2.compute.amazonaws.com
+  hosts: "{{ target_host }}"
+  #hosts: ec2-18-171-226-11.eu-west-2.compute.amazonaws.com
   become: true
   gather_facts: false
   tasks:
@@ -42,16 +42,22 @@
         flat: yes
 
     - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
-      ansible.builtin.set_stats:
-        data:
-          sos_report_path: "{{ sos_file.files[0].path }}"
+      ansible.builtin.set_fact:
+        sos_report_path: "{{ sos_file.files[0].path }}"
+
+    - debug:
+        var: sos_report_path
 
     ################################################################################################
     ##############################   UPLOAD CONTENT TO SERVICE NOW (IF REQUIRED) ###########################################
 - name: Upload sosreport to ServiceNow
   hosts: localhost
-  gather_facts: false
   tasks:
+
+    - name: Show sos_report_path from remote host
+      debug:
+        var: hostvars[target_host].sos_report_path
+
     # Attach sos report if one has been generated
     - name: Upload sos report to ServiceNow incident
       servicenow.itsm.incident:
