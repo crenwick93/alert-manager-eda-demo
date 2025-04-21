@@ -39,7 +39,7 @@
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
               work_notes: "Attempting remediation with Event Driven Ansible"
               # Low impact and urgency due to it being a production incident
-              impact: 3 # 3 = low
+              impact: 2
               urgency: 2
 
     ######################################################################################################################
