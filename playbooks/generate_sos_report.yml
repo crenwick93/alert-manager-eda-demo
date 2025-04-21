@@ -21,29 +21,11 @@
         recurse: no
       register: sos_file
 
-    # - name: create test sos file
-    #   command: touch /tmp/sos-test
-
-    # Attach sos report if one has been generated
-    # - name: Upload sos report to ServiceNow incident
-    #   servicenow.itsm.incident:
-    #     #sys_id: "{{ incident_sys_id }}"
-    #     sys_id: 98370b7cc3c1a6108f8b12d4e40131d0
-    #     attachments:
-    #       - name: sos_report
-    #         #path: "{{ sos_file.files[0].path }}"
-    #         path: /tmp/sos-test
-    #   when: incident_sys_id is defined
-
     - name: Fetch sosreport to controller
       ansible.builtin.fetch:
         src: "{{ sos_file.files[0].path }}"
         dest: "/tmp/"
         flat: yes
-
-    - name: Ensure sos_report_generated variable can be read from other job templates in a workflow
-      ansible.builtin.set_fact:
-        sos_report_path: "{{ sos_file.files[0].path }}"
 
     - name: Set local variable for sos_report_path from hostvars
       set_fact:
@@ -57,20 +39,12 @@
 - name: Upload sosreport to ServiceNow
   hosts: localhost
   tasks:
-
-    - name: Show sos_report_path from remote host
-      debug:
-        var: hostvars[target_host].sos_report_path
-
     # Attach sos report if one has been generated
     - name: Upload sos report to ServiceNow incident
       servicenow.itsm.incident:
         sys_id: "{{ incident_sys_id }}"
-        #sys_id: 98370b7cc3c1a6108f8b12d4e40131d0
         attachments:
           - name: sos_report
             path: "{{ hostvars[target_host].sos_report_path}}"
         other:
           work_notes: "{{ work_notes }}"
-            #path: /tmp/sos-test.txt
-      #when: incident_sys_id is defined
