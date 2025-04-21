@@ -31,15 +31,8 @@
       ansible.builtin.set_fact:
         sos_report_path: "{{ sos_file.files[0].path }}"
 
-    # - name: Set local variable for sos_report_path from hostvars
-    #   set_fact:
-    #     sos_report_path: "{{ hostvars[target_host].sos_report_path }}"
-
-    - debug:
-        var: sos_report_path
-
-    ################################################################################################
-    ##############################   UPLOAD CONTENT TO SERVICE NOW (IF REQUIRED) ###########################################
+###############################################################################################
+#####################  UPLOAD CONTENT TO SERVICE NOW (IF REQUIRED) ############################
 - name: Upload sosreport to ServiceNow
   hosts: localhost
   tasks:
