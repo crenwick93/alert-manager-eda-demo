@@ -40,7 +40,7 @@
               work_notes: "Attempting remediation with Event Driven Ansible"
               # Low impact and urgency due to it being a production incident
               impact: 2
-              urgency: 2
+              urgency: 3
 
     ######################################################################################################################
     # Raise critical incident if host is tagged as production
