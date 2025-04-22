@@ -10,8 +10,6 @@ scrape_configs:
   file_sd_configs:
     - files:
         - /etc/prometheus/targets.json
-  #static_configs:
-  #  - targets: ['{{ hostvars["demo-app-sandbox"].ansible_host }}:9100'] # Target app server is not local
 
 alerting:
   alertmanagers:
