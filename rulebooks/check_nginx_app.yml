@@ -1,7 +1,6 @@
 ---
 - name: Check nginx app health and run diagnostics if unavailable
   hosts: localhost
-  match_multiple_rules: true
   sources:
     - ansible.eda.url_check:
         urls:
@@ -13,31 +12,22 @@
         timeout: 5
         verify_ssl: false
   rules:
-    # - name: Remediate selinux issue
-    #   condition: event.url_check.status is defined
-    #   action:
-    #     run_module:
-    #       name: ansible.builtin.command
-    #       arguments:
-    #         cmd: cat /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
 
     - name: Debug all events
       condition: event.url_check.status is defined
       action:
         debug:
-          msg: "{{ event }}"
+          msg: "node name: {{ event.url_check.url | regex_replace('^https?://([^/]+).*$', '\\1') }}"
 
-    - name: Debug event
-      condition: event.url_check.status == "unavailable"
-      action:
-        debug:
-          msg: |
-            Event received from get_url source:
-            {{ event }}
+    # - name: Debug event
+    #   condition: event.url_check.status == "up"
+    #   action:
+    #     debug:
+    #       msg: "Application is up and working as expected"
 
 
     # - name: Run diagnostics if nginx app is down
-    #   condition: event.url_status == "unavailable"
+    #   condition: event.url_check.status == "unavailable"
     #   action:
     #     run_job_template:
     #       name: diagnostics_and_notify_snow
