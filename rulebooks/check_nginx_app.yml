@@ -15,12 +15,6 @@
     - name: Debug all events
       condition: event.url_check.status is defined
       action:
-      run_playbook:
-        name: check_trust_bundle.yml
-
-    - name: Debug all events
-      condition: event.url_check.status is defined
-      action:
         debug:
           msg: "{{ event }}"
 
