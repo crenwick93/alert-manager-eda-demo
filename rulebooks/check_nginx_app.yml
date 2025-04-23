@@ -12,13 +12,13 @@
         status_code: 200
         timeout: 5
   rules:
-    - name: Remediate selinux issue
-      condition: event.url_check.status is defined
-      action:
-        run_module:
-          name: ansible.builtin.command
-          arguments:
-            cmd: cat /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+    # - name: Remediate selinux issue
+    #   condition: event.url_check.status is defined
+    #   action:
+    #     run_module:
+    #       name: ansible.builtin.command
+    #       arguments:
+    #         cmd: cat /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
 
     - name: Debug all events
       condition: event.url_check.status is defined
