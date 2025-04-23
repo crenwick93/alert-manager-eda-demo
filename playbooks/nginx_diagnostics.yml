@@ -36,11 +36,14 @@
           diagnostics:
             nginx_service_active: "{{ nginx_status.status == 'running' }}"
             nginx_service_error: >-
-              {{ nginx_status | default({}) | dict2items | selectattr('key', 'search', 'stderr') | map(attribute='value') | join('\n') | default('') }}
+              {% if nginx_status.status != 'running' %}
+              {{ nginx_status.status | default('Unknown') }}
+              {% else %}
+              ""
+              {% endif %}
             nginx_config_ok: "{{ nginx_config_test.rc == 0 }}"
             nginx_config_error: "{{ nginx_config_test.stderr | default('') }}"
-            firewall_active: "{{ firewalld_status.status == 'running' }}"
-            firewall_error: "{{ firewalld_status | to_nice_json }}"
+            firewall_active: "{{ firewalld_status.status.ActiveState == 'active' }}"
             firewall_port_443_open: >-
               {{ '443/tcp' in (firewall_ports.firewalld_info.ports | default([])) }}
         per_host: false
