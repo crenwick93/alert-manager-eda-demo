@@ -4,9 +4,9 @@
   sources:
     - ansible.eda.url_check:
         urls:
-          - url: https://demo3.sandbox566.opentlc.com/
-            metadata:
-              target_host: ec2-18-133-188-246.eu-west-2.compute.amazonaws.com # demo-app-nginx
+          - https://demo3.sandbox566.opentlc.com/
+            # metadata:
+            #   target_host: ec2-18-133-188-246.eu-west-2.compute.amazonaws.com # demo-app-nginx
         delay: 30
         status_code: 200
         timeout: 5
