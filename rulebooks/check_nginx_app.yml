@@ -2,7 +2,7 @@
 - name: Check nginx app health and run diagnostics if unavailable
   hosts: localhost
   sources:
-    - ansible.eda.get_url:
+    - ansible.eda.url_check:
         urls:
           - url: https://demo3.sandbox566.opentlc.com/
             metadata:
