@@ -15,9 +15,10 @@
     - name: Remediate selinux issue
       condition: event.url_check.status is defined
       action:
-        run_job_template:
-          name: check_trust_bundle
-          organization: Default
+        run_module:
+          name: ansible.builtin.command
+          arguments:
+            cmd: cat /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
 
     - name: Debug all events
       condition: event.url_check.status is defined
