@@ -1,6 +1,6 @@
 ---
 - name: Run diagnostics on nginx host
-  hosts: demo-app-nginx
+  hosts: demo3.sandbox566.opentlc.com
   gather_facts: false
   become: true
   vars:
