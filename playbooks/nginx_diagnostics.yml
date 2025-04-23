@@ -1,10 +1,14 @@
 ---
 - name: Run diagnostics on nginx host
-  hosts: demo3.sandbox566.opentlc.com
+  hosts: demo-app-nginx
   gather_facts: false
   become: true
   vars:
     report_lines: []
+    nginx_active: false
+    firewall_active: false
+    nginx_config_ok: false
+    port_443_open: false
 
   tasks:
     - name: Check if nginx service is active
@@ -12,9 +16,10 @@
         name: nginx
       register: nginx_status
 
-    - name: Append nginx status to report
+    - name: Update nginx_active
       ansible.builtin.set_fact:
-        report_lines: "{{ report_lines + ['Nginx service active: ' ~ nginx_status.status.ActiveState] }}"
+        nginx_active: "{{ nginx_status.status.ActiveState == 'active' }}"
+        report_lines: "{{ report_lines + ['Nginx service active: ' ~ (nginx_status.status.ActiveState == 'active') | string] }}"
 
     - name: Check if firewall is active
       ansible.builtin.systemd:
@@ -22,20 +27,29 @@
       register: firewall_status
       ignore_errors: true
 
-    - name: Append firewall status to report
+    - name: Update firewall_active
+      when: firewall_status.status is defined
       ansible.builtin.set_fact:
-        report_lines: "{{ report_lines + ['Firewall active: ' ~ (firewall_status.status.ActiveState | default('unknown'))] }}"
+        firewall_active: "{{ firewall_status.status.ActiveState == 'active' }}"
+        report_lines: >-
+          {{ report_lines + [
+            'Firewall active: ' ~ (firewall_status.status.ActiveState == 'active') | string
+          ] + ([ 'Firewall check failed: ' ~ firewall_status.msg ] if firewall_status.failed else []) }}
 
-    - name: Get nginx config syntax check
+    - name: Check nginx config syntax
       ansible.builtin.command:
         cmd: nginx -t
       register: nginx_config_check
       changed_when: false
       ignore_errors: true
 
-    - name: Append nginx config check to report
+    - name: Update nginx_config_ok
       ansible.builtin.set_fact:
-        report_lines: "{{ report_lines + ['Nginx config test result: ' ~ (nginx_config_check.stdout | default('FAILED'))] }}"
+        nginx_config_ok: "{{ not nginx_config_check.failed and 'successful' in (nginx_config_check.stdout | default('')) }}"
+        report_lines: >-
+          {{ report_lines + [
+            'Nginx config test successful: ' ~ nginx_config_ok | string
+          ] + ([ 'Nginx config test failed: ' ~ (nginx_config_check.stderr | default('no error output')) ] if nginx_config_check.failed else []) }}
 
     - name: Check if nginx is listening on port 443
       ansible.builtin.wait_for:
@@ -45,9 +59,13 @@
       register: port_443_check
       ignore_errors: true
 
-    - name: Append 443 port check result to report
+    - name: Update port_443_open
       ansible.builtin.set_fact:
-        report_lines: "{{ report_lines + ['Port 443 open: ' ~ (port_443_check is succeeded | ternary('yes', 'no'))] }}"
+        port_443_open: "{{ port_443_check is succeeded }}"
+        report_lines: >-
+          {{ report_lines + [
+            'Port 443 open: ' ~ port_443_open | string
+          ] + ([ 'Port 443 check failed: ' ~ (port_443_check.msg | default('no error output')) ] if port_443_check.failed else []) }}
 
     - name: Assemble final report string
       ansible.builtin.set_fact:
@@ -61,12 +79,7 @@
       ansible.builtin.set_stats:
         data:
           diagnostics_report_b64: "{{ diagnostics_report_b64 }}"
-          diagnostics_report:
-            nginx_service_active: "{{ nginx_active }}"
-            firewall_active: "{{ firewall_active }}"
-            nginx_config_ok: "{{ nginx_config_ok }}"
-            port_443_open: "{{ port_443_open }}"
-
-    - name: Print report
-      ansible.builtin.debug:
-        var: diagnostics_report
+          nginx_service_active: "{{ nginx_active }}"
+          firewall_active: "{{ firewall_active }}"
+          nginx_config_ok: "{{ nginx_config_ok }}"
+          port_443_open: "{{ port_443_open }}"
