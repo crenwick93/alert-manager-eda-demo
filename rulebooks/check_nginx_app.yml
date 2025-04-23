@@ -12,6 +12,13 @@
         status_code: 200
         timeout: 5
   rules:
+    - name: Remediate selinux issue
+      condition: event.url_check.status is defined
+      action:
+        run_job_template:
+          name: check_trust_bundle
+          organization: Default
+
     - name: Debug all events
       condition: event.url_check.status is defined
       action:
