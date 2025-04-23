@@ -12,13 +12,13 @@
         timeout: 5
   rules:
     - name: Debug all events
-      condition: event.url_status is defined
+      condition: event.url_check.status is defined
       action:
         debug:
           msg: "{{ event }}"
 
     - name: Debug event
-      condition: event.url_status == "unavailable"
+      condition: event.url_check.status == "unavailable"
       action:
         debug:
           msg: |
