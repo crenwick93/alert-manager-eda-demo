@@ -1,0 +1,31 @@
+---
+- name: Check nginx app health and run diagnostics if unavailable
+  hosts: localhost
+  sources:
+    - ansible.eda.get_url:
+        urls:
+          - url: https://demo3.sandbox566.opentlc.com/
+            metadata:
+              target_host: ec2-18-133-188-246.eu-west-2.compute.amazonaws.com # demo-app-nginx
+        delay: 30
+        status_code: 200
+        timeout: 5
+  rules:
+    - name: Debug event
+      condition: event.url_status == "unavailable"
+      action:
+        debug:
+          msg: |
+            Event received from get_url source:
+            {{ event }}
+
+
+    # - name: Run diagnostics if nginx app is down
+    #   condition: event.url_status == "unavailable"
+    #   action:
+    #     run_job_template:
+    #       name: diagnostics_and_notify_snow
+    #       organization: Default
+    #       job_args:
+    #         extra_vars:
+    #           target_host: "{{ event.metadata.target_host }}"
