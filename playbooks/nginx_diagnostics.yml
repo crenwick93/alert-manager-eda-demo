@@ -1,6 +1,7 @@
 ---
 - name: Run nginx diagnostics
   hosts: demo3.sandbox566.opentlc.com
+  become: true
   gather_facts: false
   tasks:
 
