@@ -5,33 +5,54 @@
     - ansible.eda.url_check:
         urls:
           - https://demo3.sandbox566.opentlc.com/
-            # metadata:
-            #   target_host: ec2-18-133-188-246.eu-west-2.compute.amazonaws.com # demo-app-nginx
+          # You could list lots of application URLS to watch here
         delay: 30
         status_code: 200
         timeout: 5
         verify_ssl: false
   rules:
-
-    - name: Debug all events
-      condition: event.url_check.status is defined
+    - name: Debug event
+      condition: event.url_check.status == "up"
       action:
         debug:
-          msg: "node: {{ event.url_check.url.split('://')[1].split('/')[0] }}"
+          msg: "Application is up and working as expected"
 
-    # - name: Debug event
-    #   condition: event.url_check.status == "up"
-    #   action:
-    #     debug:
-    #       msg: "Application is up and working as expected"
+###############################################################################################
 
+    - name: Create incident on ServiceNow and run diagnostics
+      condition: event.url_check.status == "down"
+      action:
+        run_workflow_template:
+          name: snow_incident_nginx_diagnostics
+          organization: Default
+          post_events: true
+          job_args:
+            extra_vars:
+              short_description: "{{ event.url_check.url.split('://')[1].split('/')[0] }} is down"
+              description: "{{ event.url_check.url.split('://')[1].split('/')[0] }} is down - EDA will run diagnostics }}"
+              impact: 1
+              urgency: 1
+              target_host: "{{ event.url_check.url.split('://')[1].split('/')[0] }}"
 
-    # - name: Run diagnostics if nginx app is down
-    #   condition: event.url_check.status == "unavailable"
-    #   action:
-    #     run_job_template:
-    #       name: diagnostics_and_notify_snow
-    #       organization: Default
-    #       job_args:
-    #         extra_vars:
-    #           target_host: "{{ event.metadata.target_host }}"
+###############################################################################################
+#### RULES BELOW WILL BE TRIGGERED ON SECOND RUN (POST_EVENTS:TRUE) IF ANY CONDITIONS MATCH ###
+    # WORKING EXAMPLE
+    - name: Remediate TLS certificate issue
+      condition: event.diagnostics_result is defined and '"CERTIFICATE_VERIFY_FAILED"' in event.diagnostics_result
+      action:
+        debug:
+          msg: "Application is up and working as expected"
+
+    # FAKE EXAMPLE
+    - name: Remediate nginx config error
+      condition: event.diagnostics_result is defined and '"nginx: [emerg]"' in event.diagnostics_result
+      action:
+        debug:
+          msg: "Application is up and working as expected"
+
+    # FAKE EXAMPLE
+    - name: Remediate database connection issue
+      condition: event.diagnostics_result is defined and '"could not connect to database"' in event.diagnostics_result
+      action:
+        debug:
+          msg: "Application is up and working as expected"

@@ -1,0 +1,72 @@
+---
+- name: Run diagnostics on nginx host
+  hosts: demo-app-nginx
+  gather_facts: false
+  become: true
+  vars:
+    report_lines: []
+
+  tasks:
+    - name: Check if nginx service is active
+      ansible.builtin.systemd:
+        name: nginx
+      register: nginx_status
+
+    - name: Append nginx status to report
+      ansible.builtin.set_fact:
+        report_lines: "{{ report_lines + ['Nginx service active: ' ~ nginx_status.status.ActiveState] }}"
+
+    - name: Check if firewall is active
+      ansible.builtin.systemd:
+        name: firewalld
+      register: firewall_status
+      ignore_errors: true
+
+    - name: Append firewall status to report
+      ansible.builtin.set_fact:
+        report_lines: "{{ report_lines + ['Firewall active: ' ~ (firewall_status.status.ActiveState | default('unknown'))] }}"
+
+    - name: Get nginx config syntax check
+      ansible.builtin.command:
+        cmd: nginx -t
+      register: nginx_config_check
+      changed_when: false
+      ignore_errors: true
+
+    - name: Append nginx config check to report
+      ansible.builtin.set_fact:
+        report_lines: "{{ report_lines + ['Nginx config test result: ' ~ (nginx_config_check.stdout | default('FAILED'))] }}"
+
+    - name: Check if nginx is listening on port 443
+      ansible.builtin.wait_for:
+        port: 443
+        state: started
+        timeout: 2
+      register: port_443_check
+      ignore_errors: true
+
+    - name: Append 443 port check result to report
+      ansible.builtin.set_fact:
+        report_lines: "{{ report_lines + ['Port 443 open: ' ~ (port_443_check is succeeded | ternary('yes', 'no'))] }}"
+
+    - name: Assemble final report string
+      ansible.builtin.set_fact:
+        diagnostics_report_text: "{{ report_lines | join('\n') }}"
+
+    - name: Encode report to base64
+      ansible.builtin.set_fact:
+        diagnostics_report_b64: "{{ diagnostics_report_text | b64encode }}"
+
+    - name: Set structured and raw report as stats
+      ansible.builtin.set_stats:
+        data:
+          diagnostics_report_b64: "{{ diagnostics_report_b64 }}"
+          diagnostics_report:
+            nginx_service_active: "{{ nginx_active }}"
+            firewall_active: "{{ firewall_active }}"
+            nginx_config_ok: "{{ nginx_config_ok }}"
+            port_443_open: "{{ port_443_open }}"
+
+    - name: Print report
+      ansible.builtin.debug:
+        var: diagnostics_report

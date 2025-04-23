@@ -17,7 +17,7 @@
         impact: "{{ impact }}"
         urgency: "{{ urgency }}"
         other:
-          correlation_id: "{{ alert_fingerprint }}"
+          correlation_id: "{{ alert_fingerprint | default('') }}"
       register: create_incident
       tags:
         - create_incident
