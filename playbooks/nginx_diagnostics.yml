@@ -1,5 +1,5 @@
 ---
-- name: Run diagnostics on nginx server
+- name: Run nginx diagnostics
   hosts: demo3.sandbox566.opentlc.com
   gather_facts: false
   tasks:
@@ -7,25 +7,38 @@
     - name: Check if nginx service is active
       ansible.builtin.systemd:
         name: nginx
-      register: nginx_service
-
-    - name: Check nginx configuration syntax
-      ansible.builtin.command:
-        cmd: nginx -t
-      register: nginx_config_check
+      register: nginx_status
       ignore_errors: true
 
-    - name: Get firewalld status
-      community.general.firewalld_info:
-      register: firewall_info
+    - name: Test nginx config
+      ansible.builtin.command: nginx -t
+      register: nginx_config_test
+      changed_when: false
+      ignore_errors: true
 
-    - name: Set simple diagnostic stats
+    - name: Check if firewalld is running
+      ansible.builtin.systemd:
+        name: firewalld
+      register: firewalld_status
+      ignore_errors: true
+
+    - name: Check if port 443 is open (dry-run)
+      ansible.posix.firewalld:
+        port: 443/tcp
+        state: enabled
+        immediate: false
+        permanent: false
+      check_mode: true
+      register: firewalld_port_check
+      ignore_errors: true
+
+    - name: Set diagnostics results
       ansible.builtin.set_stats:
         data:
           diagnostics:
-            nginx_service_active: "{{ nginx_service.status.ActiveState == 'active' }}"
-            nginx_config_ok: "{{ nginx_config_check.rc == 0 }}"
-            nginx_config_error: "{{ nginx_config_check.stderr if nginx_config_check.rc != 0 else '' }}"
-            firewall_active: "{{ firewall_info.firewalld_info.active }}"
-            firewall_port_443_open: "{{ '443/tcp' in firewall_info.firewalld_info.ports }}"
-        aggregate: true
+            nginx_service_active: "{{ nginx_status.status.ActiveState == 'active' | default(false) }}"
+            nginx_service_error: "{{ nginx_status.status.SubState | default('') }}"
+            nginx_config_ok: "{{ 'successful' in (nginx_config_test.stderr | default('')) }}"
+            nginx_config_error: "{{ nginx_config_test.stderr | default('') }}"
+            firewall_active: "{{ firewalld_status.status.ActiveState == 'active' | default(false) }}"
+            firewall_port_443_open: "{{ firewalld_port_check is not failed }}"
