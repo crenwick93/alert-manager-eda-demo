@@ -11,6 +11,12 @@
         status_code: 200
         timeout: 5
   rules:
+    - name: Debug all events
+      condition: event.url_status is defined
+      action:
+        debug:
+          msg: "{{ event }}"
+
     - name: Debug event
       condition: event.url_status == "unavailable"
       action:
