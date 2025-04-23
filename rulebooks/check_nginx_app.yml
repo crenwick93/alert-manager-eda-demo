@@ -17,7 +17,7 @@
       condition: event.url_check.status is defined
       action:
         debug:
-          msg: "node name: {{ event.url_check.url | regex_replace('^https?://([^/]+).*$', '\\1') }}"
+          msg: "node: {{ event.url_check.url.split('://')[1].split('/')[0] }}"
 
     # - name: Debug event
     #   condition: event.url_check.status == "up"
