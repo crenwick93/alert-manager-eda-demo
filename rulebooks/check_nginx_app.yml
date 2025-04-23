@@ -1,6 +1,7 @@
 ---
 - name: Check nginx app health and run diagnostics if unavailable
   hosts: localhost
+  match_multiple_rules: true
   sources:
     - ansible.eda.url_check:
         urls:
@@ -11,6 +12,12 @@
         status_code: 200
         timeout: 5
   rules:
+    - name: Debug all events
+      condition: event.url_check.status is defined
+      action:
+      run_playbook:
+        name: check_trust_bundle.yml
+
     - name: Debug all events
       condition: event.url_check.status is defined
       action:
