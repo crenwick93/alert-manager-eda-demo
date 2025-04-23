@@ -1,8 +1,9 @@
 ---
 - name: Run nginx diagnostics
   hosts: demo3.sandbox566.opentlc.com
-  become: true
   gather_facts: false
+  become: true
+
   tasks:
 
     - name: Check if nginx service is active
@@ -33,13 +34,36 @@
       register: firewalld_port_check
       ignore_errors: true
 
-    - name: Set diagnostics results
+    - name: Set diagnostics variables
+      ansible.builtin.set_fact:
+        diagnostics:
+          nginx_service_active: "{{ nginx_status.status.ActiveState == 'active' | default(false) }}"
+          nginx_service_error: "{{ nginx_status.status.SubState | default('unknown') }}"
+          nginx_config_ok: "{{ 'successful' in (nginx_config_test.stderr | default('')) }}"
+          nginx_config_error: "{{ nginx_config_test.stderr | default('') }}"
+          firewall_active: "{{ firewalld_status.status.ActiveState == 'active' | default(false) }}"
+          firewall_port_443_open: "{{ firewalld_port_check is not failed }}"
+
+    - name: Build human-readable diagnostics report
+      ansible.builtin.set_fact:
+        diagnostics_report: |
+          Nginx Service Active: {{ diagnostics.nginx_service_active }}
+          Nginx Service Error: {{ diagnostics.nginx_service_error }}
+          Nginx Config OK: {{ diagnostics.nginx_config_ok }}
+          Nginx Config Error:
+          {{ diagnostics.nginx_config_error | default('None') | indent(2) }}
+
+          Firewall Service Active: {{ diagnostics.firewall_active }}
+          Port 443 Open in Firewall: {{ diagnostics.firewall_port_443_open }}
+
+    - name: Base64 encode diagnostics report
+      ansible.builtin.set_fact:
+        diagnostics_report_b64: "{{ diagnostics_report | b64encode }}"
+
+    - name: Set structured and raw report as stats
       ansible.builtin.set_stats:
         data:
-          diagnostics:
-            nginx_service_active: "{{ nginx_status.status.ActiveState == 'active' | default(false) }}"
-            nginx_service_error: "{{ nginx_status.status.SubState | default('') }}"
-            nginx_config_ok: "{{ 'successful' in (nginx_config_test.stderr | default('')) }}"
-            nginx_config_error: "{{ nginx_config_test.stderr | default('') }}"
-            firewall_active: "{{ firewalld_status.status.ActiveState == 'active' | default(false) }}"
-            firewall_port_443_open: "{{ firewalld_port_check is not failed }}"
+          diagnostics: "{{ diagnostics }}"
+          diagnostics_report_b64: "{{ diagnostics_report_b64 }}"
+        per_host: false
+        aggregate: true
