@@ -7,7 +7,7 @@
     # Simulation: Somebody has put an invalid cert on the server when rotating certs.
     - name: Replace TLS key with invalid file
       ansible.builtin.copy:
-        dest: /etc/nginx/ssl/server.cert
+        dest: /etc/nginx/ssl/server.key
         content: "this-is-not-a-valid-key"
         mode: '0600'
 
