@@ -1,69 +1,94 @@
 ---
-- name: Run nginx diagnostics
+- name: Run diagnostics on nginx host
   hosts: demo3.sandbox566.opentlc.com
   gather_facts: false
   become: true
-
   tasks:
 
-    - name: Check if nginx service is active
+    - name: Check nginx service status
       ansible.builtin.systemd:
         name: nginx
       register: nginx_status
-      ignore_errors: true
+      failed_when: false
 
     - name: Test nginx config
       ansible.builtin.command: nginx -t
-      register: nginx_config_test
-      changed_when: false
-      ignore_errors: true
+      register: nginx_config
+      failed_when: false
 
-    - name: Check if firewalld is running
+    - name: Check firewalld status
       ansible.builtin.systemd:
         name: firewalld
-      register: firewalld_status
-      ignore_errors: true
+      register: firewall_status
+      failed_when: false
 
-    - name: Check if port 443 is open (dry-run)
-      ansible.posix.firewalld:
-        port: 443/tcp
-        state: enabled
-        immediate: false
-        permanent: false
-      check_mode: true
-      register: firewalld_port_check
-      ignore_errors: true
+    - name: Get list of open firewall ports
+      ansible.builtin.command: firewall-cmd --list-ports
+      register: firewall_ports
+      failed_when: false
 
-    - name: Set diagnostics variables
-      ansible.builtin.set_fact:
-        diagnostics:
-          nginx_service_active: "{{ nginx_status.status.ActiveState == 'active' | default(false) }}"
-          nginx_service_error: "{{ nginx_status.status.SubState | default('unknown') }}"
-          nginx_config_ok: "{{ 'successful' in (nginx_config_test.stderr | default('')) }}"
-          nginx_config_error: "{{ nginx_config_test.stderr | default('') }}"
-          firewall_active: "{{ firewalld_status.status.ActiveState == 'active' | default(false) }}"
-          firewall_port_443_open: "{{ firewalld_port_check is not failed }}"
-
-    - name: Build human-readable diagnostics report
+    - name: Generate human-readable diagnostics report
       ansible.builtin.set_fact:
         diagnostics_report: |
-          Nginx Service Active: {{ diagnostics.nginx_service_active }}
-          Nginx Service Error: {{ diagnostics.nginx_service_error }}
-          Nginx Config OK: {{ diagnostics.nginx_config_ok }}
-          Nginx Config Error:
-          {{ diagnostics.nginx_config_error | default('None') | indent(2) }}
+          NGINX service active: {{ nginx_status.status.ActiveState == 'active' }}
+          NGINX service error: >-
+            {% if nginx_status.status.ActiveState != 'active' %}
+              {{ nginx_status.status }}
+            {% else %}
+              N/A
+            {% endif %}
+          NGINX config test ok: {{ nginx_config.rc == 0 }}
+          NGINX config error: >-
+            {% if nginx_config.rc != 0 %}
+              {{ nginx_config.stderr }}
+            {% else %}
+              N/A
+            {% endif %}
+          Firewalld active: {{ firewall_status.status.ActiveState == 'active' }}
+          Port 443 open: {{ firewall_ports.stdout_lines | select('match', '^443/tcp') | list | length > 0 }}
+          Overall health: >-
+            {% if (nginx_status.status.ActiveState == 'active')
+                  and (nginx_config.rc == 0)
+                  and (firewall_status.status.ActiveState == 'active')
+                  and (firewall_ports.stdout_lines | select('match', '^443/tcp') | list | length > 0) %}
+              ok
+            {% else %}
+              issues_detected
+            {% endif %}
 
-          Firewall Service Active: {{ diagnostics.firewall_active }}
-          Port 443 Open in Firewall: {{ diagnostics.firewall_port_443_open }}
-
-    - name: Base64 encode diagnostics report
+    - name: Encode diagnostics report as base64
       ansible.builtin.set_fact:
         diagnostics_report_b64: "{{ diagnostics_report | b64encode }}"
 
     - name: Set structured and raw report as stats
       ansible.builtin.set_stats:
         data:
-          diagnostics: "{{ diagnostics }}"
+          diagnostics:
+            nginx_service_active: "{{ nginx_status.status.ActiveState == 'active' }}"
+            nginx_service_error: >-
+              {% if nginx_status.status.ActiveState != 'active' %}
+                {{ nginx_status.status }}
+              {% else %}
+                ''
+              {% endif %}
+            nginx_config_ok: "{{ nginx_config.rc == 0 }}"
+            nginx_config_error: >-
+              {% if nginx_config.rc != 0 %}
+                {{ nginx_config.stderr }}
+              {% else %}
+                ''
+              {% endif %}
+            firewall_active: "{{ firewall_status.status.ActiveState == 'active' }}"
+            firewall_port_443_open: "{{ firewall_ports.stdout_lines | select('match', '^443/tcp') | list | length > 0 }}"
+            overall_health: >-
+              {% if (nginx_status.status.ActiveState == 'active')
+                    and (nginx_config.rc == 0)
+                    and (firewall_status.status.ActiveState == 'active')
+                    and (firewall_ports.stdout_lines | select('match', '^443/tcp') | list | length > 0) %}
+                ok
+              {% else %}
+                issues_detected
+              {% endif %}
           diagnostics_report_b64: "{{ diagnostics_report_b64 }}"
-        per_host: false
         aggregate: true
+        per_host: false

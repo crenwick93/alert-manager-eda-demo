@@ -38,21 +38,21 @@
 #### RULES BELOW WILL BE TRIGGERED ON SECOND RUN (POST_EVENTS:TRUE) IF ANY CONDITIONS MATCH ###
     # WORKING EXAMPLE
     - name: Remediate TLS certificate issue
-      condition: event.diagnostics_result is defined and '"CERTIFICATE_VERIFY_FAILED"' in event.diagnostics_result
+      condition: event.diagnostics is defined and '"CERTIFICATE_VERIFY_FAILED"' in event.diagnostics_result
       action:
         debug:
           msg: "Application is up and working as expected"
 
     # FAKE EXAMPLE
     - name: Remediate nginx config error
-      condition: event.diagnostics_result is defined and '"nginx: [emerg]"' in event.diagnostics_result
+      condition: event.diagnostics is defined and '"nginx: [emerg]"' in event.diagnostics_result
       action:
         debug:
           msg: "Application is up and working as expected"
 
     # FAKE EXAMPLE
     - name: Remediate database connection issue
-      condition: event.diagnostics_result is defined and '"could not connect to database"' in event.diagnostics_result
+      condition: event.diagnostics is defined and '"could not connect to database"' in event.diagnostics_result
       action:
         debug:
           msg: "Application is up and working as expected"
