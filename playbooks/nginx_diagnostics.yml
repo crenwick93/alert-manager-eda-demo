@@ -72,7 +72,7 @@
             nginx_config_error: "{{ config_error }}"
             firewall_active: "{{ fw_active }}"
             firewall_port_443_open: "{{ port_443_open }}"
-            overall_health: "{{ overall_health | string }}"
+            overall_health: "{{ overall_health | replace('\n', '') | trim }}"
           diagnostics_report_b64: "{{ diagnostics_report_b64 }}"
         aggregate: true
         per_host: false
