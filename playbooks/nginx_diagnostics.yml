@@ -78,3 +78,5 @@
           diagnostics_report_b64: "{{ diagnostics_report | b64encode }}"
         per_host: false
         aggregate: true
+
+
