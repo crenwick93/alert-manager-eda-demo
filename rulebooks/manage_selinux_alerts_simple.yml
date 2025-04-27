@@ -12,7 +12,7 @@
         - ansible.eda.normalize_keys:
   rules:
     # Log a simple msg when alert manager fires the resolved webhook
-    - name: Log SELinux resolution
+    - name: test
       condition: event.payload.status is defined
       action:
         debug:
