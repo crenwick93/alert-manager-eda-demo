@@ -11,6 +11,13 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
+    # Log a simple msg when alert manager fires the resolved webhook
+    - name: Log SELinux resolution
+      condition: event.payload.status is defined
+      action:
+        debug:
+          msg: test
+
     # Resolve the selinux issue by running the remediate_selinux job template when conditions match
     - name: Remediate selinux issue
       condition: >
