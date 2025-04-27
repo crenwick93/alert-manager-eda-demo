@@ -38,4 +38,4 @@
         event.payload.commonLabels.alertname == "selinux not enforcing"
       action:
         debug:
-          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"
+          msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance }}"
