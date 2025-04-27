@@ -6,7 +6,7 @@
   vars_files:
     - ../vault.yml
   vars:
-    eda_webhook_url: https://aap.sandbox566.opentlc.com/eda-event-streams/api/eda/v1/external_event_stream/88e7fc59-f347-401d-bb82-d6275e59a764/post/
+    eda_webhook_url: https://aap.sandbox566.opentlc.com/eda-event-streams/api/eda/v1/external_event_stream/86396dd7-a9ef-4008-989a-bb146dfae85b/post/
   roles:
     - prometheus
     - alertmanager

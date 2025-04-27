@@ -11,11 +11,11 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    # Resolve the selinux issue by running the remediate_selinux job template wbhen conditions match
+    # Resolve the selinux issue by running the remediate_selinux job template when conditions match
     - name: Remediate selinux issue
       condition: >
         event.payload.status == "firing" and
-        event.payload.commonLabels.alertname == "selinux status"
+        event.payload.commonLabels.alertname == "selinux not enforcing"
       action:
         run_job_template:
           name: remediate_selinux
@@ -25,7 +25,7 @@
     - name: Log SELinux resolution
       condition: >
         event.payload.status == "resolved" and
-        event.payload.commonLabels.alertname == "selinux status"
+        event.payload.commonLabels.alertname == "selinux not enforcing"
       action:
         debug:
           msg: "The selinux issue has been resolved on {{ event.payload.commonLabels.instance.split(':')[0] }}"

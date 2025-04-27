@@ -38,12 +38,12 @@
               instance: "{{ event.payload.commonLabels.instance }}"
               alert_fingerprint: "{{ event.payload.alerts[0].fingerprint }}"
               work_notes: "Attempting remediation with Event Driven Ansible"
-              # Low impact and urgency due to it being a production incident
+              # Low impact and urgency due to it being a non production incident
               impact: 2
               urgency: 3
 
     ######################################################################################################################
-    # Raise critical incident if host is tagged as production
+    # Raise critical incident if host is tagged as production but do not auto remediate.
 
     - name: Raise critical incident if host is tagged as production
       condition: >
