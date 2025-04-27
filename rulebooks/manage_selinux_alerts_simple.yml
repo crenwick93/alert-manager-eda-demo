@@ -27,6 +27,9 @@
         run_job_template:
           name: remediate_selinux
           organization: Default
+          job_args:
+            extra_vars:
+              target_host: "{{ event.payload.commonLabels.instance }}"
 
     # Log a simple msg when alert manager fires the resolved webhook
     - name: Log SELinux resolution
