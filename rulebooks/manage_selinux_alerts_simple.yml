@@ -12,24 +12,24 @@
         - ansible.eda.normalize_keys:
   rules:
     # Log a simple msg when alert manager fires the resolved webhook
-    # - name: test
-    #   condition: event.payload.status is defined
-    #   action:
-    #     debug:
-    #       msg: test
+    - name: test
+      condition: event.payload.status is defined
+      action:
+        debug:
+          msg: test
 
     # Resolve the selinux issue by running the remediate_selinux job template when conditions match
-    - name: Remediate selinux issue
-      condition: >
-        event.payload.status == "firing" and
-        event.payload.commonLabels.alertname == "selinux not enforcing"
-      action:
-        run_job_template:
-          name: remediate_selinux
-          organization: Default
-          job_args:
-            extra_vars:
-              target_host: "{{ event.payload.commonLabels.instance }}"
+    # - name: Remediate selinux issue
+    #   condition: >
+    #     event.payload.status == "firing" and
+    #     event.payload.commonLabels.alertname == "selinux not enforcing"
+    #   action:
+    #     run_job_template:
+    #       name: remediate_selinux
+    #       organization: Default
+    #       job_args:
+    #         extra_vars:
+    #           target_host: "{{ event.payload.commonLabels.instance }}"
 
     # Log a simple msg when alert manager fires the resolved webhook
     - name: Log SELinux resolution
