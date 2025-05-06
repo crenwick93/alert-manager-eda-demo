@@ -11,7 +11,7 @@
         state: latest
 
     - name: Run sosreport
-      command: sos report --batch --tmp-dir /tmp --only-plugins=selinux,systemd --skip-plugins=logs,yum,filesys,hardware,networking
+      command: sos report --batch --tmp-dir /tmp --only-plugins=selinux,systemd --skip-plugins=logs,yum,filesys,hardware,networking,systemd
       register: sos_out
 
     - name: Find generated sosreport file
