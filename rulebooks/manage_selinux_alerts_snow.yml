@@ -10,11 +10,6 @@
       filters:
         - ansible.eda.normalize_keys:
   rules:
-    # - name: test
-    #   condition: event.payload.status is defined
-    #   action:
-    #     debug:
-    #       msg: test
 
     # Skip remediation for sandbox hosts
     - name: Skip remediation for sandbox hosts
@@ -34,8 +29,8 @@
         event.payload.commonLabels.environment not in ["sandbox", "prod"]
       action:
         run_workflow_template:
-          name: servicenow_auto_remediate_selinux_workflow
-          organization: Default
+          name: non_prod_servicenow_auto_remediate_selinux_workflow
+          organization: Demo3
           job_args:
             extra_vars:
               target_host: "{{ event.payload.commonLabels.instance }}"
@@ -58,7 +53,7 @@
       action:
         run_workflow_template:
           name: prod_servicenow_enrich_incident_workflow
-          organization: Default
+          organization: Demo3
           job_args:
             extra_vars:
               target_host: "{{ event.payload.commonLabels.instance }}"
